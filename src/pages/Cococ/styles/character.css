@@ -1,0 +1,58 @@
+/* Character List */
+.section {
+  margin-bottom: var(--space-lg);
+}
+
+.character-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  width: 100%;
+  min-width: 0;
+}
+
+/* Character Card */
+.character-card {
+  width: 300px;
+  flex: 0 0 300px; /* 幅を固定し、伸縮を禁止 */
+  background: white;
+  border: 1px solid var(--gray-200, #e5e7eb);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Character Form */
+.character-form-container {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background-color: #f8fafc;
+  border-radius: 0.5rem;
+  width: 100%;
+}
+
+/* Form Actions */
+.form-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+/* Character List Header */
+.character-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding: 0.5rem;
+  background-color: white;
+  border-radius: 0.5rem;
+}
+
+/* Character List Controls */
+.character-list-controls {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}

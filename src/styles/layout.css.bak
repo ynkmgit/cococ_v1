@@ -1,0 +1,88 @@
+/* ゲームレイアウト */
+.game-container {
+  display: flex;
+  min-height: 100vh;
+  background-color: #f3f4f6;
+}
+
+.game-sidebar {
+  width: 260px;
+  background-color: white;
+  padding: 1.5rem;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.game-main {
+  flex: 1;
+  padding: 2rem;
+  overflow-y: auto;
+}
+
+/* セクションスタイル */
+.game-status {
+  margin-bottom: 2rem;
+}
+
+.section-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  color: #111827;
+}
+
+.subsection-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  color: #374151;
+}
+
+.content-section {
+  background-color: white;
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* アクションエリア */
+.action-section {
+  margin-top: 1rem;
+  margin-bottom: 2rem;
+}
+
+.command-section {
+  margin-top: 1.5rem;
+}
+
+/* プレースホルダー */
+.placeholder-area {
+  padding: 1rem;
+  border: 2px dashed #e5e7eb;
+  border-radius: 0.375rem;
+  text-align: center;
+  color: #6b7280;
+}
+
+.full-height {
+  height: calc(100% - 3rem);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ボタン */
+.reset-button {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background-color: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 0.375rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.reset-button:hover {
+  background-color: #dc2626;
+}
