@@ -3,7 +3,8 @@
   display: flex;
   height: 100vh;
   background-color: #f3f4f6;
-  overflow: hidden; /* コンテナレベルでオーバーフローを防ぐ */
+  overflow: hidden;
+  /* コンテナレベルでオーバーフローを防ぐ */
 }
 
 /* Sidebars */
@@ -14,32 +15,38 @@
   padding: 1rem;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   overflow-y: auto;
-  flex-shrink: 0; /* サイドバーの幅を固定 */
+  flex-shrink: 0;
+  /* サイドバーの幅を固定 */
 }
 
 .game-sidebar.right {
-  width: 520px;
-  min-width: 520px;
+  width: 420px;
+  min-width: 420px;
 }
 
 /* Main Content */
 .game-main {
-  flex: 1 1 0%; /* flex-basisを0%に設定して縮小を許可 */
-  min-width: 0; /* 重要: flexアイテムの最小幅を0に */
+  flex: 1 1 0%;
+  /* flex-basisを0%に設定して縮小を許可 */
+  min-width: 0;
+  /* 重要: flexアイテムの最小幅を0に */
   margin: 1rem;
-  overflow: hidden; /* コンテナレベルでオーバーフローを防ぐ */
+  overflow: hidden;
+  /* コンテナレベルでオーバーフローを防ぐ */
   display: flex;
 }
 
 .game-main-inner {
   flex: 1;
-  min-width: 0; /* 内部のflexアイテムも最小幅を0に */
+  min-width: 0;
+  /* 内部のflexアイテムも最小幅を0に */
   background-color: white;
   border-radius: 0.5rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   padding: 1.5rem;
   overflow-y: auto;
-  display: flex; /* flex方向を維持 */
+  display: flex;
+  /* flex方向を維持 */
 }
 
 /* Character List は character.css で定義 */
