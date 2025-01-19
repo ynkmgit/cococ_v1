@@ -7,9 +7,9 @@ export class TurnManager {
    */
   constructor(characters = []) {
     this.characters = characters;
-    
+
     // localStorageから状態を復元
-    const savedState = localStorage.getItem('turnState');
+    const savedState = sessionStorage.getItem('turnState');
     if (savedState) {
       const { currentTurn, round, actedCharactersArray, commandCompletedCharactersArray } = JSON.parse(savedState);
       this.currentTurn = currentTurn;
@@ -45,8 +45,8 @@ export class TurnManager {
   getNextActionableCharacters() {
     // 行動可能なキャラクター（アクティブかつ未行動）のみを実効DEX順にソート
     return this.characters
-      .filter(char => 
-        char.status === 'active' && 
+      .filter(char =>
+        char.status === 'active' &&
         !this.actedCharacters.has(char.id))
       .sort((a, b) => b.effectiveDex - a.effectiveDex);
   }
@@ -88,7 +88,7 @@ export class TurnManager {
 
     // 行動可能なキャラクターを取得
     const actionableChars = this.getNextActionableCharacters();
-    
+
     if (actionableChars.length === 0) {
       if (activeChars.length > 0) {
         // アクティブなキャラクターがいる場合は次のラウンドへ
@@ -106,7 +106,7 @@ export class TurnManager {
     // 次の行動キャラクターを、アクティブキャラクター配列のインデックスとして設定
     const nextCharacter = actionableChars[0];
     this.currentTurn = activeChars.findIndex(char => char.id === nextCharacter.id);
-    
+
     this.saveState();
   }
 
@@ -143,7 +143,7 @@ export class TurnManager {
       actedCharactersArray: Array.from(this.actedCharacters),
       commandCompletedCharactersArray: Array.from(this.commandCompletedCharacters)
     };
-    localStorage.setItem('turnState', JSON.stringify(state));
+    sessionStorage.setItem('turnState', JSON.stringify(state));
   }
 
   /**
@@ -171,7 +171,7 @@ export class TurnManager {
 
     // 次の行動可能なキャラクターを探す
     this.updateCurrentTurn();
-    
+
     return this.getCurrentState();
   }
 

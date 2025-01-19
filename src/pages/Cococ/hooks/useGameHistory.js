@@ -31,7 +31,7 @@ export const useGameHistory = () => {
 
   const clearHistory = useCallback(() => {
     setHistory([]);
-    localStorage.removeItem(HISTORY_STORAGE_KEY);
+    sessionStorage.removeItem(HISTORY_STORAGE_KEY);
   }, []);
 
   return {

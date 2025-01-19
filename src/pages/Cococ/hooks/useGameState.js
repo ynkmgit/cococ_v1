@@ -10,7 +10,7 @@ const SEVERE_DAMAGE_THRESHOLD = 0.5;
 
 export const useGameState = () => {
   const transaction = useTransaction();
-  
+
   const [gameState, setGameState] = useState(() => {
     const savedState = loadFromStorage(STORAGE_KEY);
     if (savedState) {
@@ -67,7 +67,7 @@ export const useGameState = () => {
       setGameState(prev => {
         const characterManager = new CharacterManager(prev.characterManager.getCharacters());
         const newCharacters = characterManager.addCharacter(newCharacter);
-        
+
         const newTurnManager = new TurnManager(newCharacters);
         newTurnManager.round = prev.turnManager.round;
         newTurnManager.actedCharacters = new Set(prev.turnManager.actedCharacters);
@@ -87,12 +87,12 @@ export const useGameState = () => {
       setGameState(prev => {
         const characterManager = new CharacterManager(prev.characterManager.getCharacters());
         const newCharacters = characterManager.updateCharacter(id, updates);
-        
+
         const newTurnManager = new TurnManager(newCharacters);
         newTurnManager.round = prev.turnManager.round;
         newTurnManager.actedCharacters = new Set(prev.turnManager.actedCharacters);
         newTurnManager.commandCompletedCharacters = new Set(prev.turnManager.commandCompletedCharacters);
-        
+
         if ('dex' in updates || 'useGun' in updates) {
           newTurnManager.updateCurrentTurn();
         } else if ('status' in updates) {
@@ -115,7 +115,7 @@ export const useGameState = () => {
       setGameState(prev => {
         const characterManager = new CharacterManager(prev.characterManager.getCharacters());
         const newCharacters = characterManager.removeCharacter(id);
-        
+
         const newTurnManager = new TurnManager(newCharacters);
         newTurnManager.round = prev.turnManager.round;
         newTurnManager.actedCharacters = new Set(prev.turnManager.actedCharacters);
@@ -134,10 +134,10 @@ export const useGameState = () => {
     transaction.commit();
     setGameState(prev => {
       if (!prev.turnManager || !prev.characterManager) return prev;
-      
+
       const currentTurnManager = prev.turnManager;
       currentTurnManager.nextTurn();
-      
+
       return {
         characterManager: prev.characterManager,
         turnManager: currentTurnManager
@@ -145,9 +145,9 @@ export const useGameState = () => {
     });
   }, [transaction]);
 
-  const handleCommandSelect = useCallback(({ 
-    command, 
-    target, 
+  const handleCommandSelect = useCallback(({
+    command,
+    target,
     damage,
     isCounterAttack
   }) => {
@@ -160,14 +160,14 @@ export const useGameState = () => {
       if (command.id === 'retire') {
         const currentCharId = prev.turnManager.getCurrentCharacter()?.id;
         if (currentCharId) {
-          updatedCharacters = characterManager.updateCharacter(currentCharId, { 
+          updatedCharacters = characterManager.updateCharacter(currentCharId, {
             status: 'retired'
           });
         }
       }
       else if (command.id === 'attack' || command.id === 'shoot') {
-        const targetId = isCounterAttack ? 
-          prev.turnManager.getCurrentCharacter()?.id : 
+        const targetId = isCounterAttack ?
+          prev.turnManager.getCurrentCharacter()?.id :
           target.id;
 
         if (targetId) {
@@ -176,12 +176,12 @@ export const useGameState = () => {
             const newHP = Math.max(0, character.currentHP - damage);
             const damageRatio = damage / character.currentHP;
             let conditions = [...(character.conditions || [])];
-            
+
             if (damageRatio >= SEVERE_DAMAGE_THRESHOLD && !conditions.includes('重症')) {
               conditions.push('重症');
             }
 
-            updatedCharacters = characterManager.updateCharacter(targetId, { 
+            updatedCharacters = characterManager.updateCharacter(targetId, {
               currentHP: newHP,
               status: newHP === 0 ? 'retired' : character.status,
               conditions
@@ -195,7 +195,7 @@ export const useGameState = () => {
       newTurnManager.round = prev.turnManager.round;
       newTurnManager.actedCharacters = new Set(prev.turnManager.actedCharacters);
       newTurnManager.commandCompletedCharacters = new Set(prev.turnManager.commandCompletedCharacters);
-      
+
       const currentCharId = newTurnManager.getCurrentCharacter()?.id;
       if (currentCharId) {
         newTurnManager.setCommandCompleted(currentCharId, true);
@@ -222,9 +222,9 @@ export const useGameState = () => {
         turnManager: new TurnManager()
       };
       setGameState(newState);
-      
-      localStorage.removeItem(STORAGE_KEY);
-      localStorage.removeItem(TURN_STORAGE_KEY);
+
+      sessionStorage.removeItem(STORAGE_KEY);
+      sessionStorage.removeItem(TURN_STORAGE_KEY);
     }
   }, []);
 
