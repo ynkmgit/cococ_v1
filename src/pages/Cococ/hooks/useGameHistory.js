@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import gameEvents from '../../../utils/GameEventEmitter';
+import gameEvents from '@/utils/GameEventEmitter';
 import { saveToStorage, loadFromStorage } from '../utils/storage';
 
 const HISTORY_STORAGE_KEY = 'cococ_game_history';

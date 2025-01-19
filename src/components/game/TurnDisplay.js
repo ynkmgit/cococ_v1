@@ -1,6 +1,6 @@
 import React from 'react';
 import { CharacterManager } from '../../utils/characterManager';
-import './TurnDisplay.css';
+import '../../styles/TurnDisplay.css';  // パスを更新
 
 const TurnDisplay = ({
   characters,

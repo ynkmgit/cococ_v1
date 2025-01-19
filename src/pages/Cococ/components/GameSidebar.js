@@ -1,6 +1,6 @@
 import React from 'react';
-import TurnDisplay from '../../../components/game/TurnDisplay';
-import ActionCommands from '../../../components/game/ActionCommands';
+import TurnDisplay from '@/components/game/TurnDisplay';
+import ActionCommands from '@/components/game/ActionCommands';
 
 const GameSidebar = ({
   className,

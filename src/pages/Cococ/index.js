@@ -5,10 +5,10 @@ import GameHistory from './components/GameHistory';
 import { useGameState } from './hooks/useGameState';
 import { useCharacterActions } from './hooks/useCharacterActions';
 import { useGameHistory } from './hooks/useGameHistory';
-import gameEvents from '../../utils/GameEventEmitter';
-import './styles/layout.css';
-import './styles/form.css';
-import './styles/character.css';
+import gameEvents from '@/utils/GameEventEmitter';
+import '@/styles/layout.css';
+import '@/styles/form.css';
+import '@/styles/character.css';
 
 const Cococ = () => {
   const {
@@ -18,6 +18,9 @@ const Cococ = () => {
     handleResetGame,
     handleCommandSelect,
     handleRollback,
+    handleCharacterAdd,
+    handleCharacterUpdate,
+    handleCharacterRemove,
     isInTransaction
   } = useGameState();
 
@@ -25,7 +28,11 @@ const Cococ = () => {
     handleAddCharacter,
     handleUpdateCharacter,
     handleRemoveCharacter
-  } = useCharacterActions(gameState, setGameState);
+  } = useCharacterActions(gameState, setGameState, {
+    handleCharacterAdd,
+    handleCharacterUpdate,
+    handleCharacterRemove
+  });
 
   const { history, clearHistory } = useGameHistory();
 
@@ -69,14 +76,14 @@ const Cococ = () => {
     }
   }, [gameState, handleCommandSelect]);
 
-  const handleUpdateCharacterWithEvents = useCallback((character, updates) => {
+  const handleUpdateCharacterWithEvents = useCallback((id, updates) => {
     const characters = gameState.characterManager.getCharacters();
-    const oldChar = characters.find(c => c.id === character.id);
-    handleUpdateCharacter(character, updates);
+    const oldChar = characters.find(c => c.id === id);
+    handleUpdateCharacter(id, updates);
     
     if (oldChar && 'hp' in updates && oldChar.hp !== updates.hp) {
       gameEvents.emit('hp', {
-        characterName: character.name,
+        characterName: oldChar.name,
         oldValue: oldChar.hp,
         newValue: updates.hp
       });

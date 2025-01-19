@@ -1,6 +1,6 @@
 import React from 'react';
 import { historyFormatters } from './formatters';
-import './styles.css';
+import '@/styles/gameHistory.css';
 
 const HistoryItem = ({ type, data, timestamp }) => {
   // フォーマッター呼び出しの安全性を確保

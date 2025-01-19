@@ -1,5 +1,5 @@
 import React from 'react';
-import CharacterList from '../../../components/characters/CharacterList';
+import CharacterList from '@/components/characters/CharacterList';
 
 const GameMain = ({
   characters,

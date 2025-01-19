@@ -1,0 +1,184 @@
+/* Character List */
+.section {
+  margin-bottom: var(--space-lg);
+}
+
+.character-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  width: 100%;
+  min-width: 0;
+}
+
+/* Character Card */
+.character-card {
+  width: 300px;
+  flex: 0 0 300px; /* 幅を固定し、伸縮を禁止 */
+  background: white;
+  border: 1px solid var(--gray-200);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Character Name */
+.character-name {
+  font-weight: bold;
+  font-size: 1.125rem;
+}
+
+.character-name.inactive {
+  color: var(--gray-600);
+}
+
+/* Character Status Display */
+.character-status-display {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* HP System */
+.hp-bar {
+  width: 100%;
+  height: 8px;
+  background-color: var(--gray-200);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  margin: var(--space-2) 0;
+  opacity: 1;
+}
+
+.hp-bar.inactive {
+  opacity: 0.7;
+}
+
+.hp-bar-fill {
+  height: 100%;
+  background-color: var(--success);
+  transition: width 0.3s ease-out;
+}
+
+.hp-bar-fill.hp-bar-low {
+  background-color: var(--danger);
+}
+
+.hp-bar-fill.hp-bar-medium {
+  background-color: var(--warning);
+}
+
+.hp-text {
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--gray-600);
+}
+
+/* Conditions Area */
+.conditions-area {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+.condition-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  font-size: 0.875rem;
+}
+
+.condition-badge-severe {
+  background-color: #FEE2E2;
+  color: #991B1B;
+  border: 1px solid #FECACA;
+}
+
+.condition-badge-other {
+  background-color: #FEF3C7;
+  color: #92400E;
+  border: 1px solid #FDE68A;
+}
+
+.condition-remove-button {
+  background: none;
+  border: none;
+  padding: 0 2px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Character Stats */
+.character-stats {
+  margin-top: var(--space-2);
+}
+
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.stat-label {
+  color: inherit;
+}
+
+.stat-label.inactive {
+  color: var(--gray-600);
+}
+
+.stat-value {
+  font-weight: 500;
+}
+
+/* Character Form */
+.character-form-container {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background-color: #f8fafc;
+  border-radius: 0.5rem;
+  width: 100%;
+}
+
+/* Form Actions */
+.form-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+/* Character List Header */
+.character-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding: 0.5rem;
+  background-color: white;
+  border-radius: 0.5rem;
+}
+
+/* Character List Controls */
+.character-list-controls {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+/* Character Card Actions */
+.character-card-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.character-action-button {
+  padding: var(--space-1) var(--space-2);
+}

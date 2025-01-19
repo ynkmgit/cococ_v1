@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
-import { CharacterManager } from '../../../utils/characterManager';
-import { TurnManager } from '../../../utils/turnManager';
+import { CharacterManager } from '@/utils/characterManager';
+import { TurnManager } from '@/utils/turnManager';
 
 export const useTransaction = () => {
   const [pending, setPending] = useState(null);
