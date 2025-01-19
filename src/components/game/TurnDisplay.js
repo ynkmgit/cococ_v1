@@ -7,22 +7,14 @@ const TurnDisplay = ({
   currentTurn,
   actedCharacters,
   onNextTurn,
-  onRollback,
   round,
-  isCommandCompleted,
-  isInTransaction
+  isCommandCompleted
 }) => {
   const characterManager = new CharacterManager(characters);
   const sortedCharacters = characterManager.getCharacters();
   const currentCharacter = sortedCharacters[currentTurn];
 
   if (!currentCharacter) return null;
-
-  const handleRollback = () => {
-    if (window.confirm('現在の行動をやり直しますか？')) {
-      onRollback();
-    }
-  };
 
   return (
     <div className="game-header-content">
@@ -52,16 +44,6 @@ const TurnDisplay = ({
           >
             {isCommandCompleted ? "次のターンへ" : "行動を選択してください"}
           </button>
-          {isCommandCompleted && (  // コマンドが完了している場合にのみ表示
-            <button
-              onClick={handleRollback}
-              className="rollback-btn manual-rollback"
-              title="このターンの行動をやり直します"
-            >
-              <span className="rollback-icon">↩️</span>
-              行動をやり直す
-            </button>
-          )}
         </div>
       </div>
     </div>

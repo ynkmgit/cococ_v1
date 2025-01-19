@@ -1,10 +1,8 @@
 import React, { useCallback, useMemo } from 'react';
 import GameSidebar from './components/GameSidebar';
 import GameMain from './components/GameMain';
-import GameHistory from './components/GameHistory';
 import { useGameState } from './hooks/useGameState';
 import { useCharacterActions } from './hooks/useCharacterActions';
-import { useGameHistory } from './hooks/useGameHistory';
 import gameEvents from '@/utils/GameEventEmitter';
 import '@/styles/layout.css';
 import '@/styles/form.css';
@@ -34,17 +32,15 @@ const Cococ = () => {
     handleCharacterRemove
   });
 
-  const { history, clearHistory } = useGameHistory();
-
   const handleNextTurnWithEvents = useCallback(() => {
     const prevRound = gameState.turnManager.getCurrentState().round;
     handleNextTurn();
-    
+
     const currentState = gameState.turnManager.getCurrentState();
     if (currentState.round > prevRound) {
       gameEvents.emit('round', { round: currentState.round });
     }
-    
+
     const currentChar = gameState.turnManager.getCurrentCharacter();
     if (currentChar) {
       gameEvents.emit('turn', { characterName: currentChar.name });
@@ -53,13 +49,12 @@ const Cococ = () => {
 
   const handleResetGameWithEvents = useCallback(() => {
     handleResetGame();
-    clearHistory();
-  }, [handleResetGame, clearHistory]);
+  }, [handleResetGame]);
 
   const handleCommandSelectWithEvents = useCallback((commandData) => {
     const { command, target, damage, isRetire } = commandData;
     handleCommandSelect(commandData);
-    
+
     const currentChar = gameState.turnManager.getCurrentCharacter();
     if (isRetire) {
       gameEvents.emit('command', {
@@ -80,7 +75,7 @@ const Cococ = () => {
     const characters = gameState.characterManager.getCharacters();
     const oldChar = characters.find(c => c.id === id);
     handleUpdateCharacter(id, updates);
-    
+
     if (oldChar && 'hp' in updates && oldChar.hp !== updates.hp) {
       gameEvents.emit('hp', {
         characterName: oldChar.name,
@@ -131,7 +126,7 @@ const Cococ = () => {
           onRollback={handleRollbackWithEvents}
         />
       </div>
-      
+
       <GameMain
         characters={characters}
         currentTurn={currentTurn}
@@ -141,9 +136,6 @@ const Cococ = () => {
         onRemoveCharacter={handleRemoveCharacter}
       />
 
-      <div className="game-sidebar right">
-        <GameHistory history={history} />
-      </div>
     </div>
   );
 };

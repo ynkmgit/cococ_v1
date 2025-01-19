@@ -1,223 +1,96 @@
-/**
- * ターン管理クラス
- */
 export class TurnManager {
-  /**
-   * @param {import('./types').Character[]} characters - キャラクターリスト
-   */
   constructor(characters = []) {
     this.characters = characters;
+    this.round = 1;  // ラウンド数の初期値を1に
+    this.currentTurn = 0;
+    this.actedCharacters = new Set();
+    this.commandCompletedCharacters = new Set();
+    this.turnCount = 1;  // ターン数の初期値を1に追加
+  }
 
-    // localStorageから状態を復元
-    const savedState = sessionStorage.getItem('turnState');
-    if (savedState) {
-      const { currentTurn, round, actedCharactersArray, commandCompletedCharactersArray } = JSON.parse(savedState);
-      this.currentTurn = currentTurn;
-      this.round = round;
-      this.actedCharacters = new Set(actedCharactersArray);
-      this.commandCompletedCharacters = new Set(commandCompletedCharactersArray);
-    } else {
-      this.currentTurn = 0;
-      this.round = 1;
-      this.actedCharacters = new Set();
-      this.commandCompletedCharacters = new Set();
+  nextTurn() {
+    const currentCharacter = this.getCurrentCharacter();
+    if (currentCharacter) {
+      this.actedCharacters.add(currentCharacter.id);
     }
 
-    // インスタンス化時に適切なターンを設定
+    // 全キャラクターが行動済みの場合
+    if (this.isAllCharactersActed()) {
+      this.round += 1;  // ラウンドを進める
+      this.actedCharacters.clear();
+      this.commandCompletedCharacters.clear();
+      this.currentTurn = 0;
+    } else {
+      this.currentTurn++;
+      this.turnCount++;  // ターン数をインクリメント
+    }
+
     this.updateCurrentTurn();
   }
 
-  /**
-   * アクティブなキャラクターのみを取得し、実効DEXで降順ソート
-   * @returns {import('./types').Character[]}
-   */
-  getActiveCharacters() {
-    // 行動済みのキャラクターは除外せず、純粋にアクティブなキャラクターを実効DEX順にソート
-    return this.characters
-      .filter(char => char.status === 'active')
-      .sort((a, b) => b.effectiveDex - a.effectiveDex);
-  }
-
-  /**
-   * 次の行動可能なキャラクターのリストを取得
-   * @returns {import('./types').Character[]}
-   */
-  getNextActionableCharacters() {
-    // 行動可能なキャラクター（アクティブかつ未行動）のみを実効DEX順にソート
-    return this.characters
-      .filter(char =>
-        char.status === 'active' &&
-        !this.actedCharacters.has(char.id))
-      .sort((a, b) => b.effectiveDex - a.effectiveDex);
-  }
-
-  /**
-   * 現在のターンのキャラクターIDを取得
-   * @returns {number|null}
-   */
-  getCurrentCharacterId() {
-    const activeChars = this.getActiveCharacters();
-    if (this.currentTurn >= 0 && this.currentTurn < activeChars.length) {
-      return activeChars[this.currentTurn].id;
-    }
-    return null;
-  }
-
-  /**
-   * 現在のターンのキャラクターを取得
-   * @returns {import('./types').Character|null}
-   */
   getCurrentCharacter() {
-    const activeChars = this.getActiveCharacters();
-    if (this.currentTurn >= 0 && this.currentTurn < activeChars.length) {
-      return activeChars[this.currentTurn];
-    }
-    return null;
+    return this.characters[this.currentTurn] || null;
   }
 
-  /**
-   * 現在のターンを更新
-   * 行動済みでないアクティブキャラクターの中で最も実効DEXが高いキャラクターのターンにする
-   */
-  updateCurrentTurn() {
-    const activeChars = this.getActiveCharacters();
-    if (activeChars.length === 0) {
-      this.reset();
-      return;
-    }
-
-    // 行動可能なキャラクターを取得
-    const actionableChars = this.getNextActionableCharacters();
-
-    if (actionableChars.length === 0) {
-      if (activeChars.length > 0) {
-        // アクティブなキャラクターがいる場合は次のラウンドへ
-        this.round++;
-        this.actedCharacters.clear();
-        this.commandCompletedCharacters.clear();
-        this.updateCurrentTurn();
-        return;
-      } else {
-        this.reset();
-        return;
-      }
-    }
-
-    // 次の行動キャラクターを、アクティブキャラクター配列のインデックスとして設定
-    const nextCharacter = actionableChars[0];
-    this.currentTurn = activeChars.findIndex(char => char.id === nextCharacter.id);
-
-    this.saveState();
+  getCurrentState() {
+    return {
+      round: this.round,
+      currentTurn: this.currentTurn,
+      actedCharacters: this.actedCharacters
+    };
   }
 
-  /**
-   * キャラクターのコマンド完了状態を設定
-   * @param {number} characterId - キャラクターID
-   * @param {boolean} completed - 完了状態
-   */
-  setCommandCompleted(characterId, completed = true) {
+  isCurrentCharacterCommandCompleted() {
+    const currentCharacter = this.getCurrentCharacter();
+    return currentCharacter ? this.commandCompletedCharacters.has(currentCharacter.id) : false;
+  }
+
+  setCommandCompleted(characterId, completed) {
     if (completed) {
       this.commandCompletedCharacters.add(characterId);
     } else {
       this.commandCompletedCharacters.delete(characterId);
     }
-    this.saveState();
   }
 
-  /**
-   * 現在のキャラクターのコマンドが完了しているか確認
-   * @returns {boolean}
-   */
-  isCurrentCharacterCommandCompleted() {
-    const currentChar = this.getCurrentCharacter();
-    return currentChar ? this.commandCompletedCharacters.has(currentChar.id) : false;
+  // ターン数を取得するメソッドを追加
+  getTurnCount() {
+    return this.turnCount;
   }
 
-  /**
-   * 状態を永続化
-   */
-  saveState() {
-    const state = {
-      currentTurn: this.currentTurn,
-      round: this.round,
-      actedCharactersArray: Array.from(this.actedCharacters),
-      commandCompletedCharactersArray: Array.from(this.commandCompletedCharacters)
-    };
-    sessionStorage.setItem('turnState', JSON.stringify(state));
-  }
-
-  /**
-   * 次のターンに進む
-   * @returns {{ currentTurn: number, round: number, actedCharacters: Set<number> }}
-   */
-  nextTurn() {
-    const currentChar = this.getCurrentCharacter();
-    if (!currentChar || !this.commandCompletedCharacters.has(currentChar.id)) {
-      return this.getCurrentState();
+  // 状態を復元するメソッドを追加
+  restoreState(savedState) {
+    if (savedState.round) this.round = savedState.round;
+    if (savedState.currentTurn) this.currentTurn = savedState.currentTurn;
+    if (savedState.turnCount) this.turnCount = savedState.turnCount;
+    if (savedState.actedCharacters) {
+      this.actedCharacters = new Set(savedState.actedCharacters);
     }
-
-    const activeCharacters = this.getActiveCharacters();
-    if (activeCharacters.length === 0) {
-      this.reset();
-      return this.getCurrentState();
+    if (savedState.commandCompletedCharacters) {
+      this.commandCompletedCharacters = new Set(savedState.commandCompletedCharacters);
     }
-
-    // 現在のキャラクターを行動済みにする
-    if (this.currentTurn >= 0 && this.currentTurn < activeCharacters.length) {
-      const currentCharId = currentChar.id;
-      this.actedCharacters.add(currentCharId);
-      this.commandCompletedCharacters.delete(currentCharId);  // コマンド完了状態をリセット
-    }
-
-    // 次の行動可能なキャラクターを探す
-    this.updateCurrentTurn();
-
-    return this.getCurrentState();
   }
 
-  /**
-   * キャラクターの状態変更時に呼び出す
-   * @param {import('./types').Character} character - 状態が変更されたキャラクター
-   */
+  isAllCharactersActed() {
+    return this.characters.every(character => 
+      this.actedCharacters.has(character.id) || 
+      character.status === 'retired'
+    );
+  }
+
+  updateCurrentTurn() {
+    while (
+      this.currentTurn < this.characters.length && 
+      (this.actedCharacters.has(this.characters[this.currentTurn]?.id) || 
+       this.characters[this.currentTurn]?.status === 'retired')
+    ) {
+      this.currentTurn++;
+    }
+  }
+
   onCharacterStatusChange(character) {
-    // inactiveまたはretiredになった場合、行動済みリストから削除
-    if (character.status !== 'active' && this.actedCharacters.has(character.id)) {
-      this.actedCharacters.delete(character.id);
-      this.commandCompletedCharacters.delete(character.id);  // コマンド完了状態もリセット
+    if (character.status === 'retired') {
+      this.updateCurrentTurn();
     }
-    this.updateCurrentTurn();
-    this.saveState();
-  }
-
-  /**
-   * 現在のターン情報を取得
-   * @returns {{ currentTurn: number, round: number, actedCharacters: Set<number> }}
-   */
-  getCurrentState() {
-    // アクティブキャラクターがいない場合は初期状態を返す
-    if (this.getActiveCharacters().length === 0) {
-      return {
-        currentTurn: 0,
-        round: 1,
-        actedCharacters: new Set()
-      };
-    }
-
-    return {
-      currentTurn: this.currentTurn,
-      round: this.round,
-      actedCharacters: this.actedCharacters
-    };
-  }
-
-  /**
-   * ゲーム状態をリセット
-   */
-  reset() {
-    this.currentTurn = 0;
-    this.round = 1;
-    this.actedCharacters.clear();
-    this.commandCompletedCharacters.clear();
-    this.saveState();
   }
 }

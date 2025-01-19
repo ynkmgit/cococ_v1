@@ -1,27 +1,22 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import { saveToStorage, loadFromStorage } from '../utils/storage';
 import { CharacterManager } from '@/utils/characterManager';
 import { TurnManager } from '@/utils/turnManager';
-import { useTransaction } from './useTransaction';
 
 const STORAGE_KEY = 'cococ_game_state';
 const TURN_STORAGE_KEY = 'turnState';
 const SEVERE_DAMAGE_THRESHOLD = 0.5;
 
 export const useGameState = () => {
-  const transaction = useTransaction();
-
   const [gameState, setGameState] = useState(() => {
     const savedState = loadFromStorage(STORAGE_KEY);
     if (savedState) {
       const characterManager = new CharacterManager(savedState.characters);
       const turnManager = new TurnManager(savedState.characters);
-      if (savedState.round) turnManager.round = savedState.round;
-      if (savedState.currentTurn) turnManager.currentTurn = savedState.currentTurn;
-      if (savedState.actedCharacters) turnManager.actedCharacters = new Set(savedState.actedCharacters);
-      if (savedState.commandCompletedCharacters) {
-        turnManager.commandCompletedCharacters = new Set(savedState.commandCompletedCharacters);
-      }
+      
+      // 保存された状態を復元
+      turnManager.restoreState(savedState);
+
       return {
         characterManager,
         turnManager
@@ -33,117 +28,128 @@ export const useGameState = () => {
     };
   });
 
-  useEffect(() => {
-    if (!transaction.isInTransaction() && gameState.turnManager?.getCurrentCharacter()) {
-      transaction.begin(gameState);
-    }
-  }, [gameState.turnManager?.currentTurn, transaction]);
-
-  useEffect(() => {
-    if (!gameState.characterManager || !gameState.turnManager) return;
-
-    const state = {
-      characters: gameState.characterManager.getCharacters(),
-      round: gameState.turnManager.round,
-      currentTurn: gameState.turnManager.currentTurn,
-      actedCharacters: Array.from(gameState.turnManager.actedCharacters),
-      commandCompletedCharacters: Array.from(gameState.turnManager.commandCompletedCharacters)
-    };
-    saveToStorage(STORAGE_KEY, state);
-  }, [gameState]);
-
-  const handleCharacterChange = useCallback((changeFunction) => {
-    if (transaction.isInTransaction()) {
-      const restoredState = transaction.rollback();
-      if (restoredState) {
-        setGameState(restoredState);
-      }
-    }
-    changeFunction();
-  }, [transaction]);
-
   const handleCharacterAdd = useCallback((newCharacter) => {
-    handleCharacterChange(() => {
-      setGameState(prev => {
-        const characterManager = new CharacterManager(prev.characterManager.getCharacters());
-        const newCharacters = characterManager.addCharacter(newCharacter);
+    setGameState(prev => {
+      const characterManager = new CharacterManager(prev.characterManager.getCharacters());
+      const newCharacters = characterManager.addCharacter(newCharacter);
 
-        const newTurnManager = new TurnManager(newCharacters);
-        newTurnManager.round = prev.turnManager.round;
-        newTurnManager.actedCharacters = new Set(prev.turnManager.actedCharacters);
-        newTurnManager.commandCompletedCharacters = new Set(prev.turnManager.commandCompletedCharacters);
-        newTurnManager.updateCurrentTurn();
+      const newTurnManager = new TurnManager(newCharacters);
+      newTurnManager.round = prev.turnManager.round;
+      newTurnManager.turnCount = prev.turnManager.turnCount;
+      newTurnManager.actedCharacters = new Set(prev.turnManager.actedCharacters);
+      newTurnManager.commandCompletedCharacters = new Set(prev.turnManager.commandCompletedCharacters);
+      newTurnManager.updateCurrentTurn();
 
-        return {
-          characterManager: new CharacterManager(newCharacters),
-          turnManager: newTurnManager
-        };
-      });
+      // キャラクター追加時のみ状態を保存
+      // 既存のキャラクターの状態は維持したまま、新しいキャラクターを追加
+      const savedState = loadFromStorage(STORAGE_KEY) || {};
+      const updatedState = {
+        ...savedState,
+        characters: newCharacters,
+        round: newTurnManager.round,
+        currentTurn: newTurnManager.currentTurn,
+        turnCount: newTurnManager.turnCount
+      };
+      saveToStorage(STORAGE_KEY, updatedState);
+
+      return {
+        characterManager: new CharacterManager(newCharacters),
+        turnManager: newTurnManager
+      };
     });
-  }, [handleCharacterChange]);
+  }, []);
 
   const handleCharacterUpdate = useCallback((id, updates) => {
-    handleCharacterChange(() => {
-      setGameState(prev => {
-        const characterManager = new CharacterManager(prev.characterManager.getCharacters());
-        const newCharacters = characterManager.updateCharacter(id, updates);
+    setGameState(prev => {
+      const characterManager = new CharacterManager(prev.characterManager.getCharacters());
+      const newCharacters = characterManager.updateCharacter(id, updates);
 
-        const newTurnManager = new TurnManager(newCharacters);
-        newTurnManager.round = prev.turnManager.round;
-        newTurnManager.actedCharacters = new Set(prev.turnManager.actedCharacters);
-        newTurnManager.commandCompletedCharacters = new Set(prev.turnManager.commandCompletedCharacters);
+      const newTurnManager = new TurnManager(newCharacters);
+      newTurnManager.round = prev.turnManager.round;
+      newTurnManager.turnCount = prev.turnManager.turnCount;
+      newTurnManager.actedCharacters = new Set(prev.turnManager.actedCharacters);
+      newTurnManager.commandCompletedCharacters = new Set(prev.turnManager.commandCompletedCharacters);
+      newTurnManager.currentTurn = prev.turnManager.currentTurn;
 
-        if ('dex' in updates || 'useGun' in updates) {
-          newTurnManager.updateCurrentTurn();
-        } else if ('status' in updates) {
-          const updatedCharacter = newCharacters.find(char => char.id === id);
-          if (updatedCharacter) {
-            newTurnManager.onCharacterStatusChange(updatedCharacter);
-          }
+      if ('dex' in updates || 'useGun' in updates) {
+        newTurnManager.updateCurrentTurn();
+      } else if ('status' in updates) {
+        const updatedCharacter = newCharacters.find(char => char.id === id);
+        if (updatedCharacter) {
+          newTurnManager.onCharacterStatusChange(updatedCharacter);
         }
+      }
 
-        return {
-          characterManager: new CharacterManager(newCharacters),
-          turnManager: newTurnManager
-        };
-      });
+      return {
+        characterManager: new CharacterManager(newCharacters),
+        turnManager: newTurnManager
+      };
     });
-  }, [handleCharacterChange]);
+  }, []);
 
   const handleCharacterRemove = useCallback((id) => {
-    handleCharacterChange(() => {
-      setGameState(prev => {
-        const characterManager = new CharacterManager(prev.characterManager.getCharacters());
-        const newCharacters = characterManager.removeCharacter(id);
+    setGameState(prev => {
+      const characterManager = new CharacterManager(prev.characterManager.getCharacters());
+      const newCharacters = characterManager.removeCharacter(id);
 
-        const newTurnManager = new TurnManager(newCharacters);
-        newTurnManager.round = prev.turnManager.round;
-        newTurnManager.actedCharacters = new Set(prev.turnManager.actedCharacters);
-        newTurnManager.commandCompletedCharacters = new Set(prev.turnManager.commandCompletedCharacters);
-        newTurnManager.updateCurrentTurn();
+      const newTurnManager = new TurnManager(newCharacters);
+      newTurnManager.round = prev.turnManager.round;
+      newTurnManager.turnCount = prev.turnManager.turnCount;
+      newTurnManager.actedCharacters = new Set(prev.turnManager.actedCharacters);
+      newTurnManager.commandCompletedCharacters = new Set(prev.turnManager.commandCompletedCharacters);
+      newTurnManager.currentTurn = prev.turnManager.currentTurn;
+      newTurnManager.updateCurrentTurn();
 
-        return {
-          characterManager: new CharacterManager(newCharacters),
-          turnManager: newTurnManager
-        };
-      });
+      // キャラクター削除時のみ状態を保存
+      // 他のキャラクターの状態は維持したまま、キャラクターを削除
+      const savedState = loadFromStorage(STORAGE_KEY) || {};
+      const updatedState = {
+        ...savedState,
+        characters: newCharacters,
+        round: newTurnManager.round,
+        currentTurn: newTurnManager.currentTurn,
+        turnCount: newTurnManager.turnCount
+      };
+      saveToStorage(STORAGE_KEY, updatedState);
+
+      return {
+        characterManager: new CharacterManager(newCharacters),
+        turnManager: newTurnManager
+      };
     });
-  }, [handleCharacterChange]);
+  }, []);
 
   const handleNextTurn = useCallback(() => {
-    transaction.commit();
     setGameState(prev => {
       if (!prev.turnManager || !prev.characterManager) return prev;
 
-      const currentTurnManager = prev.turnManager;
-      currentTurnManager.nextTurn();
+      const newTurnManager = new TurnManager(prev.characterManager.getCharacters());
+      newTurnManager.round = prev.turnManager.round;
+      newTurnManager.turnCount = prev.turnManager.turnCount;
+      newTurnManager.currentTurn = prev.turnManager.currentTurn;
+      newTurnManager.actedCharacters = new Set(prev.turnManager.actedCharacters);
+      newTurnManager.commandCompletedCharacters = new Set(prev.turnManager.commandCompletedCharacters);
+
+      newTurnManager.nextTurn();
+
+      // ターン進行時のみ状態を保存
+      const state = {
+        characters: prev.characterManager.getCharacters(),
+        round: newTurnManager.round,
+        currentTurn: newTurnManager.currentTurn,
+        actedCharacters: Array.from(newTurnManager.actedCharacters),
+        commandCompletedCharacters: Array.from(newTurnManager.commandCompletedCharacters),
+        roundCount: newTurnManager.round,
+        turnCount: newTurnManager.getTurnCount()
+      };
+      saveToStorage(STORAGE_KEY, state);
 
       return {
         characterManager: prev.characterManager,
-        turnManager: currentTurnManager
+        turnManager: newTurnManager
       };
     });
-  }, [transaction]);
+  }, []);
 
   const handleCommandSelect = useCallback(({
     command,
@@ -193,6 +199,8 @@ export const useGameState = () => {
       const newCharacterManager = new CharacterManager(updatedCharacters);
       const newTurnManager = new TurnManager(updatedCharacters);
       newTurnManager.round = prev.turnManager.round;
+      newTurnManager.turnCount = prev.turnManager.turnCount;
+      newTurnManager.currentTurn = prev.turnManager.currentTurn;
       newTurnManager.actedCharacters = new Set(prev.turnManager.actedCharacters);
       newTurnManager.commandCompletedCharacters = new Set(prev.turnManager.commandCompletedCharacters);
 
@@ -208,13 +216,6 @@ export const useGameState = () => {
     });
   }, []);
 
-  const handleRollback = useCallback(() => {
-    const restoredState = transaction.rollback();
-    if (restoredState) {
-      setGameState(restoredState);
-    }
-  }, [transaction]);
-
   const handleResetGame = useCallback(() => {
     if (window.confirm('ゲームをリセットしてもよろしいですか？')) {
       const newState = {
@@ -222,7 +223,6 @@ export const useGameState = () => {
         turnManager: new TurnManager()
       };
       setGameState(newState);
-
       sessionStorage.removeItem(STORAGE_KEY);
       sessionStorage.removeItem(TURN_STORAGE_KEY);
     }
@@ -234,10 +234,8 @@ export const useGameState = () => {
     handleNextTurn,
     handleResetGame,
     handleCommandSelect,
-    handleRollback,
     handleCharacterAdd,
     handleCharacterUpdate,
-    handleCharacterRemove,
-    isInTransaction: transaction.isInTransaction()
+    handleCharacterRemove
   };
 };

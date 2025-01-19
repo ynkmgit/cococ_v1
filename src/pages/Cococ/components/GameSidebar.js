@@ -14,8 +14,7 @@ const GameSidebar = ({
   isInTransaction,
   onNextTurn,
   onResetGame,
-  onCommandSelect,
-  onRollback
+  onCommandSelect
 }) => {
   return (
     <aside className={className}>
@@ -27,18 +26,16 @@ const GameSidebar = ({
             currentTurn={currentTurn}
             actedCharacters={actedCharacters}
             onNextTurn={onNextTurn}
-            onRollback={onRollback}
             round={round}
             isCommandCompleted={isCommandCompleted}
-            isInTransaction={isInTransaction}
           />
         )}
       </div>
-      
+
       <div className="command-section">
         <h3 className="subsection-title">行動コマンド</h3>
         {currentCharacter && (
-          <ActionCommands 
+          <ActionCommands
             characters={characters}
             currentCharacterId={currentCharacterId}
             onCommandSelect={onCommandSelect}
