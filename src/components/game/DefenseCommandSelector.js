@@ -23,12 +23,6 @@ const DefenseCommandSelector = ({ target, onDefenseSelect, onCancel }) => {
     ? baseDefenseCommands
     : [
       ...baseDefenseCommands,
-      {
-        id: 'maneuver',
-        name: 'マヌーバー',
-        description: '特殊な対応を行う',
-        icon: '🔄'
-      }
     ];
 
   return (

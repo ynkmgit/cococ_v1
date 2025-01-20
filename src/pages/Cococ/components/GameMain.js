@@ -3,7 +3,7 @@ import CharacterList from '@/components/characters/CharacterList';
 
 const GameMain = ({
   characters,
-  currentTurn,
+  currentCharacterIndex,
   actedCharacters,
   onAddCharacter,
   onUpdateCharacter,
@@ -17,7 +17,7 @@ const GameMain = ({
           onAddCharacter={onAddCharacter}
           onUpdateCharacter={onUpdateCharacter}
           onRemoveCharacter={onRemoveCharacter}
-          currentTurn={currentTurn}
+          currentCharacterIndex={currentCharacterIndex}
           actedCharacters={actedCharacters}
         />
       </div>

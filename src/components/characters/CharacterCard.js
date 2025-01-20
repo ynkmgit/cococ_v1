@@ -7,7 +7,7 @@ const CharacterCard = ({
   character,
   onUpdate,
   onRemove,
-  isCurrentTurn = false,
+  isCurrentCharacter = false,
   hasActed = false
 }) => {
   const [isEditing, setIsEditing] = useState(false);
@@ -66,8 +66,8 @@ const CharacterCard = ({
         style += 'retired-character ';
         break;
       default:
-        if (isCurrentTurn) {
-          style += 'current-turn ';
+        if (isCurrentCharacter) {
+          style += 'current-character ';
         }
         if (hasActed) {
           style += 'acted ';

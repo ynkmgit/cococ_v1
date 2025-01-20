@@ -64,12 +64,6 @@ const ActionCommands = ({
         description: '通常攻撃を行う',
         icon: '⚔️'
       },
-      {
-        id: 'maneuver',
-        name: 'マヌーバー',
-        description: '特殊な行動を行う',
-        icon: '🔄'
-      },
       ...commands
     ];
   }
@@ -100,8 +94,6 @@ const ActionCommands = ({
           isRetire: true
         });
       }
-    } else if (command.id === 'maneuver') {
-      setShowTargetSelector(true);
     } else if (command.id === 'shoot') {
       setShowTargetSelector(true);
     } else if (command.id === 'attack') {
@@ -115,8 +107,6 @@ const ActionCommands = ({
 
     if (selectedCommand.id === 'shoot') {
       setShowGunAttack(true);
-    } else if (selectedCommand.id === 'maneuver') {
-      setShowDefenseSelector(true);
     } else {
       setShowDefenseSelector(true);
     }
@@ -162,10 +152,6 @@ const ActionCommands = ({
 
   const handleDamageSubmit = ({ amount, isCounterAttack }) => {
     if (selectedCommand && selectedTarget && selectedDefense && attackerSuccess && defenderSuccess) {
-      let maneuverSuccess = false;
-      if (selectedCommand.id === 'maneuver') {
-        maneuverSuccess = successLevelValue[attackerSuccess] > successLevelValue[defenderSuccess];
-      }
 
       onCommandSelect({
         command: selectedCommand,
@@ -175,7 +161,6 @@ const ActionCommands = ({
         defenderSuccess: defenderSuccess,
         damage: amount,
         isCounterAttack,
-        maneuverSuccess
       });
     }
     resetSelections();
@@ -282,7 +267,6 @@ const ActionCommands = ({
           attackerSuccess={attackerSuccess}
           defenderSuccess={defenderSuccess}
           defenseType={selectedDefense}
-          isManeuver={selectedCommand.id === 'maneuver'}
           onDamageSubmit={handleDamageSubmit}
           onClose={handleCancel}
         />

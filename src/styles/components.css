@@ -131,13 +131,13 @@
   gap: var(--space-3);
 }
 
-/* Current Turn Card */
-.current-turn {
+/* Current Character Card */
+.current-character {
   box-shadow: 0 0 0 2px var(--primary);
   background-color: var(--gray-50);
 }
 
-.current-turn:hover {
+.current-character:hover {
   box-shadow: 0 0 0 2px var(--primary), var(--shadow-md);
 }
 

@@ -19,6 +19,7 @@ const Cococ = () => {
     handleCharacterAdd,
     handleCharacterUpdate,
     handleCharacterRemove,
+    handleLoadGame,
     isInTransaction
   } = useGameState();
 
@@ -51,6 +52,14 @@ const Cococ = () => {
     handleResetGame();
   }, [handleResetGame]);
 
+  const handleLoadGameWithEvents = useCallback((saveData) => {
+    handleLoadGame(saveData);
+    gameEvents.emit('gameLoaded', {
+      round: saveData.round,
+      characterName: saveData.characters[saveData.turnState.currentCharacterIndex]?.name
+    });
+  }, [handleLoadGame]);
+
   const handleCommandSelectWithEvents = useCallback((commandData) => {
     const { command, target, damage, isRetire } = commandData;
     handleCommandSelect(commandData);
@@ -71,6 +80,13 @@ const Cococ = () => {
     }
   }, [gameState, handleCommandSelect]);
 
+  const handleRollbackWithEvents = useCallback(() => {
+    handleRollback();
+    gameEvents.emit('rollback', {
+      characterName: gameState.turnManager.getCurrentCharacter()?.name
+    });
+  }, [gameState, handleRollback]);
+
   const handleUpdateCharacterWithEvents = useCallback((id, updates) => {
     const characters = gameState.characterManager.getCharacters();
     const oldChar = characters.find(c => c.id === id);
@@ -84,13 +100,6 @@ const Cococ = () => {
       });
     }
   }, [gameState, handleUpdateCharacter]);
-
-  const handleRollbackWithEvents = useCallback(() => {
-    handleRollback();
-    gameEvents.emit('rollback', {
-      characterName: gameState.turnManager.getCurrentCharacter()?.name
-    });
-  }, [gameState, handleRollback]);
 
   const gameData = useMemo(() => {
     const characters = gameState.characterManager.getCharacters();
@@ -106,7 +115,7 @@ const Cococ = () => {
   }, [gameState]);
 
   const { characters, currentState, currentCharacter, isCommandCompleted, currentCharacterId } = gameData;
-  const { round, currentTurn, actedCharacters } = currentState;
+  const { round, currentCharacterIndex, actedCharacters } = currentState;
 
   return (
     <div className="game-container">
@@ -115,13 +124,14 @@ const Cococ = () => {
           characters={characters}
           currentCharacter={currentCharacter}
           currentCharacterId={currentCharacterId}
-          currentTurn={currentTurn}
+          currentCharacterIndex={currentCharacterIndex}
           actedCharacters={actedCharacters}
           round={round}
           isCommandCompleted={isCommandCompleted}
           isInTransaction={isInTransaction}
           onNextTurn={handleNextTurnWithEvents}
           onResetGame={handleResetGameWithEvents}
+          onLoadGame={handleLoadGameWithEvents}
           onCommandSelect={handleCommandSelectWithEvents}
           onRollback={handleRollbackWithEvents}
         />
@@ -129,13 +139,12 @@ const Cococ = () => {
 
       <GameMain
         characters={characters}
-        currentTurn={currentTurn}
+        currentCharacterIndex={currentCharacterIndex}
         actedCharacters={actedCharacters}
         onAddCharacter={handleAddCharacter}
         onUpdateCharacter={handleUpdateCharacterWithEvents}
         onRemoveCharacter={handleRemoveCharacter}
       />
-
     </div>
   );
 };

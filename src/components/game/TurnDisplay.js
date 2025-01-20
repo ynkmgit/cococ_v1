@@ -4,7 +4,7 @@ import '../../styles/TurnDisplay.css';  // パスを更新
 
 const TurnDisplay = ({
   characters,
-  currentTurn,
+  currentCharacterIndex,
   actedCharacters,
   onNextTurn,
   round,
@@ -12,7 +12,7 @@ const TurnDisplay = ({
 }) => {
   const characterManager = new CharacterManager(characters);
   const sortedCharacters = characterManager.getCharacters();
-  const currentCharacter = sortedCharacters[currentTurn];
+  const currentCharacter = sortedCharacters[currentCharacterIndex];
 
   if (!currentCharacter) return null;
 

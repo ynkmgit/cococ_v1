@@ -21,7 +21,6 @@ const CombatResult = ({
   attackerSuccess,
   defenderSuccess,
   defenseType,
-  isManeuver = false,
   onDamageSubmit,
   onClose
 }) => {
@@ -41,23 +40,7 @@ const CombatResult = ({
       };
     }
 
-    if (isManeuver) {
-      if (attackerLevel > defenderLevel) {
-        return {
-          success: 'attacker',
-          message: 'マヌーバー成功！',
-          showDamageInput: false,
-          showCompleteButton: true
-        };
-      } else {
-        return {
-          success: 'defender',
-          message: 'マヌーバー失敗...',
-          showDamageInput: false,
-          showCompleteButton: true
-        };
-      }
-    } else if (defenseType === 'dodge') {
+    if (defenseType === 'dodge') {
       // 回避の場合
       if (defenderLevel >= attackerLevel) {
         return {
@@ -109,23 +92,19 @@ const CombatResult = ({
   return (
     <div className="combat-result">
       <div className="combat-result-header">
-        <h4 className="combat-result-title">{isManeuver ? 'マヌーバー結果' : '戦闘結果'}</h4>
+        <h4 className="combat-result-title">戦闘結果</h4>
         <button onClick={onClose} className="cancel-button">×</button>
       </div>
 
       <div className="combat-result-content">
         <div className="success-comparison">
           <div className="participant-success">
-            <span className="participant-name">{attacker.name}（{isManeuver ? 'マヌーバー側' : '攻撃側'}）</span>
+            <span className="participant-name">{attacker.name}（攻撃）</span>
             <span className="success-level">{successLevelNames[attackerSuccess]}</span>
           </div>
           <div className="success-separator">VS</div>
           <div className="participant-success">
-            <span className="participant-name">{defender.name}（{
-              isManeuver ? '防御側' :
-                defenseType === 'dodge' ? '回避' :
-                  defenseType === 'counter' ? '応戦' : '不明'
-            }）</span>
+            <span className="participant-name">{defender.name}（防御側）</span>
             <span className="success-level">{successLevelNames[defenderSuccess]}</span>
           </div>
         </div>

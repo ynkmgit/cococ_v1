@@ -8,7 +8,7 @@ const CharacterList = ({
   onAddCharacter, 
   onUpdateCharacter, 
   onRemoveCharacter,
-  currentTurn = 0,
+  currentCharacterIndex = 0,
   actedCharacters = new Set()
 }) => {
   const [showForm, setShowForm] = useState(false);
@@ -24,7 +24,7 @@ const CharacterList = ({
 
   // アクティブなキャラクターのみを取得してインデックスを計算（ターン管理用）
   const activeCharacters = sortedCharacters.filter(char => char.status === 'active');
-  const currentCharacter = activeCharacters[currentTurn];
+  const currentCharacter = activeCharacters[currentCharacterIndex];
 
   return (
     <div className="section">
@@ -79,7 +79,7 @@ const CharacterList = ({
               }
             }}
             onRemove={onRemoveCharacter}
-            isCurrentTurn={currentCharacter && character.id === currentCharacter.id}
+            isCurrentCharacter={currentCharacter && character.id === currentCharacter.id}
             hasActed={actedCharacters.has(character.id)}
           />
         ))}
