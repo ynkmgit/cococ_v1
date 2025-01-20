@@ -37,14 +37,7 @@ const ActionCommands = ({
   const currentCharacter = characters.find(char => char.id === currentCharacterId);
 
   // 使用可能なコマンドを動的に生成
-  let commands = [
-    {
-      id: 'retire',
-      name: '離脱',
-      description: '戦闘から離脱する',
-      icon: '🚪'
-    }
-  ];
+  let commands = [];
 
   if (currentCharacter.useGun) {
     commands = [
@@ -63,6 +56,12 @@ const ActionCommands = ({
         name: '攻撃',
         description: '通常攻撃を行う',
         icon: '⚔️'
+      },
+      {
+        id: 'retire',
+        name: '離脱',
+        description: '戦闘から離脱する',
+        icon: '🚪'
       },
       ...commands
     ];

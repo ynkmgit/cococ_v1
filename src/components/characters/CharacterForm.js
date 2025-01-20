@@ -11,7 +11,8 @@ const CharacterForm = ({ onAddCharacter, editCharacter = null }) => {
     maxHP: 0,
     dex: 0,
     useGun: false,
-    conditions: []
+    conditions: [],
+    memo: ''
   });
 
   const [errors, setErrors] = useState({});
@@ -66,7 +67,8 @@ const CharacterForm = ({ onAddCharacter, editCharacter = null }) => {
         maxHP: 0,
         dex: 0,
         useGun: false,
-        conditions: []
+        conditions: [],
+        memo: ''
       });
     }
     setErrors({});
@@ -172,6 +174,69 @@ const CharacterForm = ({ onAddCharacter, editCharacter = null }) => {
               </svg>
             )}
           </button>
+          <button
+            type="button"
+            onClick={() => handleConditionToggle('転倒')}
+            className={`condition-button ${isConditionActive('転倒') ? 'active' : 'inactive'}`}
+          >
+            転倒
+            {isConditionActive('転倒') && (
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+            )}
+          </button>
+          <button
+            type="button"
+            onClick={() => handleConditionToggle('潜在狂気')}
+            className={`condition-button ${isConditionActive('潜在狂気') ? 'active' : 'inactive'}`}
+          >
+            潜在狂気
+            {isConditionActive('潜在狂気') && (
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+            )}
+          </button>
+          <button
+            type="button"
+            onClick={() => handleConditionToggle('狂気発作')}
+            className={`condition-button ${isConditionActive('狂気発作') ? 'active' : 'inactive'}`}
+          >
+            狂気発作
+            {isConditionActive('狂気発作') && (
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+            )}
+          </button>
+          <button
+            type="button"
+            onClick={() => handleConditionToggle('意識不明')}
+            className={`condition-button ${isConditionActive('意識不明') ? 'active' : 'inactive'}`}
+          >
+            意識不明
+            {isConditionActive('意識不明') && (
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+            )}
+          </button>
+        </div>
+      </div>
+
+      <div className="form-section">
+        <div className="form-field">
+          <label htmlFor="memo" className="form-label">メモ</label>
+          <textarea
+            id="memo"
+            name="memo"
+            value={newCharacter.memo}
+            onChange={handleInputChange}
+            className="form-textarea"
+            placeholder="自由にメモを記入"
+            rows="3"
+          />
         </div>
       </div>
 

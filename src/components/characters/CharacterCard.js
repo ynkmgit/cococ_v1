@@ -11,6 +11,8 @@ const CharacterCard = ({
   hasActed = false
 }) => {
   const [isEditing, setIsEditing] = useState(false);
+  const [isEditingMemo, setIsEditingMemo] = useState(false);
+  const [memoInput, setMemoInput] = useState(character.memo || '');
 
   const handleInputChange = (field, value) => {
     if (field === 'currentHP') {
@@ -153,7 +155,11 @@ const CharacterCard = ({
             編集
           </button>
           <button
-            onClick={() => onRemove(character.id)}
+            onClick={() => {
+              if (window.confirm(`${character.name}を本当に削除しますか？`)) {
+                onRemove(character.id);
+              }
+            }}
             className="btn btn-danger character-action-button"
           >
             削除
@@ -166,9 +172,12 @@ const CharacterCard = ({
           {character.conditions.map((condition, index) => (
             <span
               key={index}
-              className={`condition-badge ${
-                condition === '重症' ? 'condition-badge-severe' : 'condition-badge-other'
-              }`}
+              className={`condition-badge ${condition === '重症' ? 'condition-badge-severe' :
+                condition === '転倒' ? 'condition-badge-fall' :
+                  condition === '潜在狂気' ? 'condition-badge-latent' :
+                    condition === '狂気発作' ? 'condition-badge-madness' :
+                      condition === '意識不明' ? 'condition-badge-unconscious' : 'condition-badge-other'
+                }`}
             >
               {condition}
               <button
@@ -231,6 +240,47 @@ const CharacterCard = ({
             <span className={`stat-label ${character.status !== 'active' ? 'inactive' : ''}`}>実効DEX:</span>
             <span className="stat-value">{character.effectiveDex}</span>
           </div>
+        </div>
+
+        <div className="character-memo">
+          <div className="memo-label">メモ:</div>
+          {isEditingMemo ? (
+            <div className="memo-edit">
+              <textarea
+                value={memoInput}
+                onChange={(e) => setMemoInput(e.target.value)}
+                className="memo-textarea"
+                rows="3"
+              />
+              <div className="memo-edit-buttons">
+                <button
+                  onClick={() => {
+                    onUpdate(character.id, { memo: memoInput });
+                    setIsEditingMemo(false);
+                  }}
+                  className="btn btn-primary"
+                >
+                  保存
+                </button>
+                <button
+                  onClick={() => {
+                    setMemoInput(character.memo || '');
+                    setIsEditingMemo(false);
+                  }}
+                  className="btn btn-secondary"
+                >
+                  キャンセル
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div
+              className="memo-content"
+              onClick={() => setIsEditingMemo(true)}
+            >
+              {character.memo || 'クリックしてメモを追加'}
+            </div>
+          )}
         </div>
       </div>
     </div>

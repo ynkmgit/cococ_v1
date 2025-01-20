@@ -25,7 +25,7 @@ const SaveControl = ({
     loadSavedGames();
   }, [loadSavedGames]);
 
-  // 自動保存前のイベントリスナー
+  // イベントリスナーの登録
   useEffect(() => {
     const saveControls = document.querySelector('.save-controls');
     if (!saveControls) return;
@@ -34,24 +34,23 @@ const SaveControl = ({
       console.log("[SaveControl] Pre-autosave event received");
     };
 
-    saveControls.addEventListener('preAutosave', handlePreAutoSave);
-    return () => saveControls.removeEventListener('preAutosave', handlePreAutoSave);
-  }, []);
-
-  // 自動保存後のイベントリスナー
-  useEffect(() => {
-    const saveControls = document.querySelector('.save-controls');
-    if (!saveControls) return;
-
     const handlePostAutoSave = (e) => {
       console.log("[SaveControl] Post-autosave event received", e.detail);
       if (e.detail?.savedData) {
-        loadSavedGames();
+        // 状態更新を次のレンダリングサイクルに遅延させる
+        setTimeout(() => {
+          loadSavedGames();
+        }, 0);
       }
     };
 
+    saveControls.addEventListener('preAutosave', handlePreAutoSave);
     saveControls.addEventListener('postAutosave', handlePostAutoSave);
-    return () => saveControls.removeEventListener('postAutosave', handlePostAutoSave);
+
+    return () => {
+      saveControls.removeEventListener('preAutosave', handlePreAutoSave);
+      saveControls.removeEventListener('postAutosave', handlePostAutoSave);
+    };
   }, [loadSavedGames]);
 
   // 手動保存処理
@@ -72,8 +71,10 @@ const SaveControl = ({
     );
 
     if (saveData) {
-      // 保存後に保存リストを更新
-      loadSavedGames();
+      // 状態更新を次のレンダリングサイクルに遅延させる
+      setTimeout(() => {
+        loadSavedGames();
+      }, 0);
     }
   };
 
@@ -85,8 +86,10 @@ const SaveControl = ({
     if (saveData) {
       onLoadGame(saveData);
       setSelectedSaveId(''); // 選択をリセット
-      // 読み込み後に保存リストを更新
-      loadSavedGames();
+      // 状態更新を次のレンダリングサイクルに遅延させる
+      setTimeout(() => {
+        loadSavedGames();
+      }, 0);
     }
   };
 

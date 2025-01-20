@@ -3,7 +3,7 @@
  * @returns {string}
  */
 const generateRandomName = () => {
-  const prefixes = ['戦士', '冒険者', '放浪者', '傭兵', '旅人', '商人', '騎士', '盗賊', '狩人', '流浪人'];
+  const prefixes = ['アスリート', '医師', '活動家', '刑事', '私立探偵', '犯罪者', '放浪者', '狂信者', '怪物', '獣'];
   const suffixes = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N'];
   const prefix = prefixes[Math.floor(Math.random() * prefixes.length)];
   const suffix = suffixes[Math.floor(Math.random() * suffixes.length)];
@@ -26,12 +26,12 @@ const getRandomNumber = (min, max) => {
  */
 export const generateRandomCharacter = () => {
   const dex = getRandomNumber(30, 70);
-  const maxHP = getRandomNumber(30, 100);
+  const maxHP = getRandomNumber(8, 18);
 
   return {
     name: generateRandomName(),
     dex,
-    useGun: Math.random() > 0.7, // 30%の確率で火器所持
+    useGun: Math.random() > 0.8, // 20%の確率で火器所持
     currentHP: maxHP,
     maxHP,
     status: 'active'

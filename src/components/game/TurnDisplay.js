@@ -8,7 +8,6 @@ const TurnDisplay = ({
   actedCharacters,
   onNextTurn,
   round,
-  isCommandCompleted
 }) => {
   const characterManager = new CharacterManager(characters);
   const sortedCharacters = characterManager.getCharacters();
@@ -31,7 +30,7 @@ const TurnDisplay = ({
             <div className="character-dex">
               DEX: {currentCharacter.effectiveDex}
               {currentCharacter.useGun && (
-                <span className="weapon-status">火器</span>
+                <span className="weapon-status"> 火器</span>
               )}
             </div>
           </div>
@@ -40,9 +39,8 @@ const TurnDisplay = ({
           <button
             onClick={onNextTurn}
             className="next-turn-btn"
-            disabled={!isCommandCompleted}
           >
-            {isCommandCompleted ? "次のターンへ" : "行動を選択してください"}
+            次のターンへ
           </button>
         </div>
       </div>

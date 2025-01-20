@@ -10,7 +10,6 @@ export class TurnManager {
     this.currentCharacterIndex = 0;
     this.round = 1;
     this.actedCharacters = new Set();
-    this.commandCompletedCharacters = new Set();
 
     // インスタンス化時に適切なインデックスを設定
     this.updateCurrentCharacterIndex();
@@ -78,7 +77,6 @@ export class TurnManager {
       if (activeChars.length > 0) {
         this.round++;
         this.actedCharacters.clear();
-        this.commandCompletedCharacters.clear();
         this.updateCurrentCharacterIndex();
         return;
       } else {
@@ -92,34 +90,12 @@ export class TurnManager {
   }
 
   /**
-   * キャラクターのコマンド完了状態を設定
-   * @param {number} characterId - キャラクターID
-   * @param {boolean} completed - 完了状態
-   */
-  setCommandCompleted(characterId, completed = true) {
-    if (completed) {
-      this.commandCompletedCharacters.add(characterId);
-    } else {
-      this.commandCompletedCharacters.delete(characterId);
-    }
-  }
-
-  /**
-   * 現在のキャラクターのコマンドが完了しているか確認
-   * @returns {boolean}
-   */
-  isCurrentCharacterCommandCompleted() {
-    const currentChar = this.getCurrentCharacter();
-    return currentChar ? this.commandCompletedCharacters.has(currentChar.id) : false;
-  }
-
-  /**
    * 次のキャラクターに進む
    * @returns {{ currentCharacterIndex: number, round: number, actedCharacters: Set<number> }}
    */
   nextTurn() {
     const currentChar = this.getCurrentCharacter();
-    if (!currentChar || !this.commandCompletedCharacters.has(currentChar.id)) {
+    if (!currentChar) {
       return this.getCurrentState();
     }
 
@@ -132,7 +108,6 @@ export class TurnManager {
     if (this.currentCharacterIndex >= 0 && this.currentCharacterIndex < activeCharacters.length) {
       const currentCharId = currentChar.id;
       this.actedCharacters.add(currentCharId);
-      this.commandCompletedCharacters.delete(currentCharId);
     }
 
     this.updateCurrentCharacterIndex();
@@ -146,7 +121,6 @@ export class TurnManager {
   onCharacterStatusChange(character) {
     if (character.status !== 'active' && this.actedCharacters.has(character.id)) {
       this.actedCharacters.delete(character.id);
-      this.commandCompletedCharacters.delete(character.id);
     }
     this.updateCurrentCharacterIndex();
   }
@@ -178,6 +152,5 @@ export class TurnManager {
     this.currentCharacterIndex = 0;
     this.round = 1;
     this.actedCharacters.clear();
-    this.commandCompletedCharacters.clear();
   }
 }

@@ -141,6 +141,30 @@
   border: 1px solid #FECACA;
 }
 
+.condition-badge-fall {
+  background-color: #FEF3C7;
+  color: #92400E;
+  border: 1px solid #FDE68A;
+}
+
+.condition-badge-latent {
+  background-color: #E0E7FF;
+  color: #3730A3;
+  border: 1px solid #C7D2FE;
+}
+
+.condition-badge-madness {
+  background-color: #FCE7F3;
+  color: #9D174D;
+  border: 1px solid #FBCFE8;
+}
+
+.condition-badge-unconscious {
+  background-color: #E5E7EB;
+  color: #1F2937;
+  border: 1px solid #D1D5DB;
+}
+
 .condition-badge-other {
   background-color: #FEF3C7;
   color: #92400E;
@@ -167,6 +191,64 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+/* Memo */
+.character-memo {
+  margin-top: var(--space-2);
+  padding: var(--space-2);
+  background-color: var(--gray-50);
+  border-radius: var(--radius-md);
+}
+
+.memo-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--gray-600);
+  margin-bottom: var(--space-1);
+}
+
+.memo-content {
+  font-size: 0.875rem;
+  color: var(--gray-700);
+  white-space: pre-wrap;
+  word-break: break-word;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  transition: background-color 0.2s;
+}
+
+.memo-content:hover {
+  background-color: var(--gray-100);
+}
+
+.memo-edit {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.memo-textarea {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid var(--gray-200);
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  resize: vertical;
+  min-height: 80px;
+}
+
+.memo-textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 1px var(--primary);
+}
+
+.memo-edit-buttons {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
 }
 
 .stat-label {

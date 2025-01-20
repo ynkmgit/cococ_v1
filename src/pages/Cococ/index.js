@@ -109,12 +109,11 @@ const Cococ = () => {
       characters,
       currentState,
       currentCharacter,
-      isCommandCompleted: gameState.turnManager.isCurrentCharacterCommandCompleted(),
       currentCharacterId: currentCharacter?.id || null,
     };
   }, [gameState]);
 
-  const { characters, currentState, currentCharacter, isCommandCompleted, currentCharacterId } = gameData;
+  const { characters, currentState, currentCharacter, currentCharacterId } = gameData;
   const { round, currentCharacterIndex, actedCharacters } = currentState;
 
   return (
@@ -127,7 +126,6 @@ const Cococ = () => {
           currentCharacterIndex={currentCharacterIndex}
           actedCharacters={actedCharacters}
           round={round}
-          isCommandCompleted={isCommandCompleted}
           isInTransaction={isInTransaction}
           onNextTurn={handleNextTurnWithEvents}
           onResetGame={handleResetGameWithEvents}

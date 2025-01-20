@@ -13,12 +13,11 @@ export const useGameState = () => {
     if (savedData) {
       const characterManager = new CharacterManager(savedData.characters);
       const turnManager = new TurnManager(savedData.characters);
-      
+
       turnManager.round = savedData.round;
       turnManager.currentCharacterIndex = savedData.turnState.currentCharacterIndex;
       turnManager.actedCharacters = new Set(savedData.turnState.actedCharacters);
-      turnManager.commandCompletedCharacters = new Set(savedData.turnState.commandCompletedCharacters);
-      
+
       return {
         characterManager,
         turnManager
@@ -47,7 +46,6 @@ export const useGameState = () => {
         turnManager.round = saveData.round;
         turnManager.currentCharacterIndex = saveData.turnState.currentCharacterIndex;
         turnManager.actedCharacters = new Set(saveData.turnState.actedCharacters);
-        turnManager.commandCompletedCharacters = new Set(saveData.turnState.commandCompletedCharacters);
 
         // SaveManagerの状態も更新
         const [round, turn] = saveData.id.split('_').map(Number);
@@ -75,7 +73,6 @@ export const useGameState = () => {
         const characterTurnManager = new TurnManager(newCharacters);
         characterTurnManager.round = prev.turnManager.round;
         characterTurnManager.actedCharacters = new Set(prev.turnManager.actedCharacters);
-        characterTurnManager.commandCompletedCharacters = new Set(prev.turnManager.commandCompletedCharacters);
         characterTurnManager.updateCurrentCharacterIndex();
 
         return {
@@ -98,7 +95,6 @@ export const useGameState = () => {
         const characterTurnManager = new TurnManager(newCharacters);
         characterTurnManager.round = prev.turnManager.round;
         characterTurnManager.actedCharacters = new Set(prev.turnManager.actedCharacters);
-        characterTurnManager.commandCompletedCharacters = new Set(prev.turnManager.commandCompletedCharacters);
 
         if ('dex' in updates || 'useGun' in updates) {
           characterTurnManager.updateCurrentCharacterIndex();
@@ -129,7 +125,6 @@ export const useGameState = () => {
         const characterTurnManager = new TurnManager(newCharacters);
         characterTurnManager.round = prev.turnManager.round;
         characterTurnManager.actedCharacters = new Set(prev.turnManager.actedCharacters);
-        characterTurnManager.commandCompletedCharacters = new Set(prev.turnManager.commandCompletedCharacters);
         characterTurnManager.updateCurrentCharacterIndex();
 
         return {
@@ -144,7 +139,7 @@ export const useGameState = () => {
 
   const handleNextTurn = useCallback(() => {
     console.log('[handleNextTurn] Starting next turn transition');
-    
+
     setIsInTransaction(true);
     try {
       setGameState(prev => {
@@ -153,7 +148,6 @@ export const useGameState = () => {
         const characterTurnManager = new TurnManager(prev.characterManager.getCharacters());
         characterTurnManager.round = prev.turnManager.round;
         characterTurnManager.actedCharacters = new Set(prev.turnManager.actedCharacters);
-        characterTurnManager.commandCompletedCharacters = new Set(prev.turnManager.commandCompletedCharacters);
         characterTurnManager.currentCharacterIndex = prev.turnManager.currentCharacterIndex;
 
         console.log('[handleNextTurn] Current round:', characterTurnManager.round);
@@ -251,13 +245,8 @@ export const useGameState = () => {
         const characterTurnManager = new TurnManager(updatedCharacters);
         characterTurnManager.round = prev.turnManager.round;
         characterTurnManager.actedCharacters = new Set(prev.turnManager.actedCharacters);
-        characterTurnManager.commandCompletedCharacters = new Set(prev.turnManager.commandCompletedCharacters);
         characterTurnManager.currentCharacterIndex = prev.turnManager.currentCharacterIndex;
 
-        const currentCharId = characterTurnManager.getCurrentCharacter()?.id;
-        if (currentCharId) {
-          characterTurnManager.setCommandCompleted(currentCharId, true);
-        }
 
         return {
           characterManager: newCharacterManager,
@@ -278,13 +267,8 @@ export const useGameState = () => {
         const characterTurnManager = new TurnManager(prev.characterManager.getCharacters());
         characterTurnManager.round = prev.turnManager.round;
         characterTurnManager.actedCharacters = new Set(prev.turnManager.actedCharacters);
-        characterTurnManager.commandCompletedCharacters = new Set(prev.turnManager.commandCompletedCharacters);
         characterTurnManager.currentCharacterIndex = prev.turnManager.currentCharacterIndex;
 
-        const currentCharId = characterTurnManager.getCurrentCharacter()?.id;
-        if (currentCharId) {
-          characterTurnManager.setCommandCompleted(currentCharId, false);
-        }
 
         return {
           characterManager: prev.characterManager,

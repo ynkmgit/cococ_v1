@@ -11,7 +11,6 @@ const GameSidebar = ({
   currentCharacterIndex,
   actedCharacters,
   round,
-  isCommandCompleted,
   isInTransaction,
   onNextTurn,
   onResetGame,
@@ -29,7 +28,6 @@ const GameSidebar = ({
             actedCharacters={actedCharacters}
             onNextTurn={onNextTurn}
             round={round}
-            isCommandCompleted={isCommandCompleted}
           />
         )}
       </div>
