@@ -165,6 +165,12 @@
   border: 1px solid #D1D5DB;
 }
 
+.condition-badge-bound {
+  background-color: #DBEAFE;
+  color: #1E40AF;
+  border: 1px solid #BFDBFE;
+}
+
 .condition-badge-other {
   background-color: #FEF3C7;
   color: #92400E;

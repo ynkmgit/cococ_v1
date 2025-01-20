@@ -24,22 +24,33 @@ const CombatResult = ({
   onDamageSubmit,
   onClose
 }) => {
-  const [damage, setDamage] = useState('');
+  const [damage, setDamage] = useState('0');
 
   const attackerLevel = successLevelValue[attackerSuccess];
   const defenderLevel = successLevelValue[defenderSuccess];
 
   const determineResult = () => {
-    // 両者失敗の場合を先に判定
-    if (attackerSuccess === 'failure' && defenderSuccess === 'failure') {
+    // 攻撃側失敗ならダメージ発生しない
+    if (attackerSuccess === 'failure') {
       return {
         success: 'none',
-        message: '両者失敗！攻撃は不発に終わった',
+        message: '攻撃失敗！',
         showDamageInput: false,
         showCompleteButton: true
       };
     }
 
+    // 何もしない場合
+    if (defenseType === 'no-action') {
+      return {
+        success: 'attacker',
+        message: '攻撃成功！効果を適用してください。',
+        showDamageInput: true,
+        showCompleteButton: false
+      };
+    }
+
+    // 通常の対抗判定
     if (defenseType === 'dodge') {
       // 回避の場合
       if (defenderLevel >= attackerLevel) {
@@ -55,7 +66,7 @@ const CombatResult = ({
       if (defenderLevel > attackerLevel) {
         return {
           success: 'defender',
-          message: '応戦に成功！反撃を行います。',
+          message: '応戦・防御マヌーバーに成功！効果を適用してください。',
           showDamageInput: true,
           showCompleteButton: false
         };
@@ -65,7 +76,7 @@ const CombatResult = ({
     // それ以外は攻撃側の勝利
     return {
       success: 'attacker',
-      message: '攻撃が命中！',
+      message: '攻撃・戦闘マヌーバーに成功！効果を適用してください。',
       showDamageInput: true,
       showCompleteButton: false
     };
@@ -102,11 +113,15 @@ const CombatResult = ({
             <span className="participant-name">{attacker.name}（攻撃）</span>
             <span className="success-level">{successLevelNames[attackerSuccess]}</span>
           </div>
-          <div className="success-separator">VS</div>
-          <div className="participant-success">
-            <span className="participant-name">{defender.name}（防御側）</span>
-            <span className="success-level">{successLevelNames[defenderSuccess]}</span>
-          </div>
+          {defenderSuccess && (
+            <>
+              <div className="success-separator">VS</div>
+              <div className="participant-success">
+                <span className="participant-name">{defender.name}（防御側）</span>
+                <span className="success-level">{successLevelNames[defenderSuccess]}</span>
+              </div>
+            </>
+          )}
         </div>
 
         <div className="result-message">

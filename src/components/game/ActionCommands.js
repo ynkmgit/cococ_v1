@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
 import TargetSelector from './TargetSelector';
+import DistanceSelector from './DistanceSelector';
 import DefenseCommandSelector from './DefenseCommandSelector';
 import SuccessLevelSelector from './SuccessLevelSelector';
 import CombatResult from './CombatResult';
+import ManeuverResult from './ManeuverResult';
+import DefenseManeuverResult from './DefenseManeuverResult';
 import GunAttackResult from './GunAttackResult';
 import '../../styles/commands.css';
 
@@ -21,11 +24,15 @@ const ActionCommands = ({
   const [selectedCommand, setSelectedCommand] = useState(null);
   const [showTargetSelector, setShowTargetSelector] = useState(false);
   const [selectedTarget, setSelectedTarget] = useState(null);
+  const [showDistanceSelector, setShowDistanceSelector] = useState(false);
+  const [isZeroDistance, setIsZeroDistance] = useState(false);
   const [showDefenseSelector, setShowDefenseSelector] = useState(false);
   const [selectedDefense, setSelectedDefense] = useState(null);
   const [showAttackerSuccess, setShowAttackerSuccess] = useState(false);
   const [showDefenderSuccess, setShowDefenderSuccess] = useState(false);
   const [showCombatResult, setShowCombatResult] = useState(false);
+  const [showManeuverResult, setShowManeuverResult] = useState(false);
+  const [showDefenseManeuverResult, setShowDefenseManeuverResult] = useState(false);
   const [attackerSuccess, setAttackerSuccess] = useState(null);
   const [defenderSuccess, setDefenderSuccess] = useState(null);
   const [showGunAttack, setShowGunAttack] = useState(false);
@@ -36,15 +43,15 @@ const ActionCommands = ({
 
   const currentCharacter = characters.find(char => char.id === currentCharacterId);
 
-  // 使用可能なコマンドを動的に生成
+  // 使用可能な行動を動的に生成
   let commands = [];
 
   if (currentCharacter.useGun) {
     commands = [
       {
         id: 'shoot',
-        name: '射撃',
-        description: '火器での射撃を行う',
+        name: '火器攻撃',
+        description: '火器攻撃を行う',
         icon: '🔫'
       },
       ...commands
@@ -53,9 +60,15 @@ const ActionCommands = ({
     commands = [
       {
         id: 'attack',
-        name: '攻撃',
-        description: '通常攻撃を行う',
+        name: '近接攻撃',
+        description: '近接武器による攻撃を行う',
         icon: '⚔️'
+      },
+      {
+        id: 'maneuver',
+        name: '戦闘マヌーバー',
+        description: '特殊な戦闘行動を行う',
+        icon: '🎯'
       },
       {
         id: 'retire',
@@ -67,6 +80,9 @@ const ActionCommands = ({
     ];
   }
 
+  const handleCancel = () => {
+    resetSelections();
+  };
   const handleCommandClick = (command) => {
     setSelectedCommand(command);
     setSelectedTarget(null);
@@ -74,14 +90,17 @@ const ActionCommands = ({
     setAttackerSuccess(null);
     setDefenderSuccess(null);
     setShowDefenseSelector(false);
+    setShowDistanceSelector(false);
+    setIsZeroDistance(false);
     setShowAttackerSuccess(false);
     setShowDefenderSuccess(false);
     setShowCombatResult(false);
+    setShowManeuverResult(false);
+    setShowDefenseManeuverResult(false);
     setShowGunAttack(false);
     setGunAttacks([]);
 
     if (command.id === 'retire') {
-      // 離脱コマンドの場合は確認後に即時実行
       if (window.confirm('本当に離脱しますか？')) {
         onCommandSelect({
           command: command,
@@ -93,9 +112,7 @@ const ActionCommands = ({
           isRetire: true
         });
       }
-    } else if (command.id === 'shoot') {
-      setShowTargetSelector(true);
-    } else if (command.id === 'attack') {
+    } else if (command.id === 'shoot' || command.id === 'attack' || command.id === 'maneuver') {
       setShowTargetSelector(true);
     }
   };
@@ -105,13 +122,24 @@ const ActionCommands = ({
     setShowTargetSelector(false);
 
     if (selectedCommand.id === 'shoot') {
-      setShowGunAttack(true);
+      setShowDistanceSelector(true); // 距離選択を表示
     } else {
       setShowDefenseSelector(true);
     }
   };
 
-  const handleGunShot = ({ success, damage }) => {
+  const handleDistanceSelect = (isZero) => {
+    setIsZeroDistance(isZero);
+    setShowDistanceSelector(false);
+
+    if (isZero) {
+      setShowDefenseSelector(true); // 0距離の場合は防御選択へ
+    } else {
+      setShowGunAttack(true); // 通常距離の場合は従来の射撃フローへ
+    }
+  };
+
+  const handleGunShot = ({ success, damage, isZeroDistance: isZero }) => {
     onCommandSelect({
       command: selectedCommand,
       target: selectedTarget,
@@ -120,7 +148,8 @@ const ActionCommands = ({
       defenderSuccess: null,
       damage: damage,
       isGunAttack: true,
-      isSingleShot: true
+      isSingleShot: true,
+      isZeroDistance: isZero
     });
 
     const newAttacks = [...gunAttacks, { success, damage }];
@@ -132,26 +161,77 @@ const ActionCommands = ({
   };
 
   const handleDefenseSelect = (defenseType) => {
+    console.log('Selected defense type:', defenseType);
     setSelectedDefense(defenseType);
     setShowDefenseSelector(false);
-    setShowAttackerSuccess(true);
+
+    if (selectedCommand.id === 'shoot' && isZeroDistance && defenseType === 'defense-maneuver') {
+      // 0距離射撃での防御マヌーバー選択時は対抗ロールへ
+      setShowAttackerSuccess(true);
+    } else if (selectedCommand.id === 'shoot' && isZeroDistance) {
+      // 0距離射撃で防御マヌーバー以外の選択時は射撃判定へ
+      setShowGunAttack(true);
+    } else {
+      setShowAttackerSuccess(true);
+    }
   };
 
   const handleAttackerSuccessSelect = (successLevel) => {
     setAttackerSuccess(successLevel);
     setShowAttackerSuccess(false);
-    setShowDefenderSuccess(true);
+
+    // 「何もしない」が選択された場合
+    if (selectedDefense === 'no-action') {
+      // 通常の結果画面に進む
+      if (selectedCommand.id === 'attack') {
+        setShowCombatResult(true);
+      } else if (selectedCommand.id === 'maneuver') {
+        setShowManeuverResult(true);
+      }
+    } else {
+      // 「何もしない」以外は通常通り防御側の判定へ
+      setShowDefenderSuccess(true);
+    }
   };
 
   const handleDefenderSuccessSelect = (successLevel) => {
     setDefenderSuccess(successLevel);
     setShowDefenderSuccess(false);
-    setShowCombatResult(true);
+
+    console.log('Command:', selectedCommand.id);
+    console.log('Defense:', selectedDefense);
+
+    // 攻撃側と防御側の成功度を比較
+    const attackerLevel = successLevelValue[attackerSuccess];
+    const defenderLevel = successLevelValue[successLevel];
+
+    if (selectedCommand.id === 'shoot' && isZeroDistance && selectedDefense === 'defense-maneuver') {
+      // 0距離射撃での防御マヌーバー
+      if (attackerLevel === 0 || (defenderLevel > attackerLevel)) {
+        // 攻撃側が失敗、または防御側が上回った場合のみ防御側の処理
+        setShowDefenseManeuverResult(true);
+      } else {
+        // それ以外（攻撃側の成功度が高い、または同値）は攻撃成功
+        setShowGunAttack(true);
+      }
+    } else if (selectedDefense === 'defense-maneuver') {
+      // 通常の防御マヌーバー
+      if (attackerLevel === 0 || (defenderLevel > attackerLevel)) {
+        // 攻撃側が失敗、または防御側が上回った場合のみ防御側の処理
+        setShowDefenseManeuverResult(true);
+      } else {
+        // それ以外（攻撃側の成功度が高い、または同値）は攻撃成功
+        setShowCombatResult(true);
+      }
+    } else if (selectedCommand.id === 'attack') {
+      setShowCombatResult(true);
+    } else if (selectedCommand.id === 'maneuver') {
+      setShowManeuverResult(true);
+    }
   };
 
   const handleDamageSubmit = ({ amount, isCounterAttack }) => {
-    if (selectedCommand && selectedTarget && selectedDefense && attackerSuccess && defenderSuccess) {
-
+    if (selectedCommand && selectedTarget && selectedDefense && attackerSuccess) {
       onCommandSelect({
         command: selectedCommand,
         target: selectedTarget,
@@ -160,12 +240,41 @@ const ActionCommands = ({
         defenderSuccess: defenderSuccess,
         damage: amount,
         isCounterAttack,
+        isZeroDistance: selectedCommand.id === 'shoot' ? isZeroDistance : undefined
       });
     }
     resetSelections();
   };
 
-  const handleCancel = () => {
+  const handleManeuverComplete = () => {
+    if (selectedCommand && selectedTarget && selectedDefense && attackerSuccess) {
+      onCommandSelect({
+        command: selectedCommand,
+        target: selectedTarget,
+        defenseType: selectedDefense,
+        attackerSuccess: attackerSuccess,
+        defenderSuccess: defenderSuccess,
+        damage: 0,
+        isManeuver: true,
+        isZeroDistance: selectedCommand.id === 'shoot' ? isZeroDistance : undefined
+      });
+    }
+    resetSelections();
+  };
+
+  const handleDefenseManeuverComplete = () => {
+    if (selectedCommand && selectedTarget && selectedDefense && attackerSuccess) {
+      onCommandSelect({
+        command: selectedCommand,
+        target: selectedTarget,
+        defenseType: selectedDefense,
+        attackerSuccess: attackerSuccess,
+        defenderSuccess: defenderSuccess,
+        damage: 0,
+        isDefenseManeuver: true,
+        isZeroDistance: selectedCommand.id === 'shoot' ? isZeroDistance : undefined
+      });
+    }
     resetSelections();
   };
 
@@ -173,11 +282,15 @@ const ActionCommands = ({
     setSelectedCommand(null);
     setShowTargetSelector(false);
     setSelectedTarget(null);
+    setShowDistanceSelector(false);
+    setIsZeroDistance(false);
     setShowDefenseSelector(false);
     setSelectedDefense(null);
     setShowAttackerSuccess(false);
     setShowDefenderSuccess(false);
     setShowCombatResult(false);
+    setShowManeuverResult(false);
+    setShowDefenseManeuverResult(false);
     setShowGunAttack(false);
     setAttackerSuccess(null);
     setDefenderSuccess(null);
@@ -186,12 +299,14 @@ const ActionCommands = ({
 
   return (
     <div className="action-commands">
-      {/* 初期コマンド選択 */}
       {!showTargetSelector &&
+        !showDistanceSelector &&
         !showDefenseSelector &&
         !showAttackerSuccess &&
         !showDefenderSuccess &&
         !showCombatResult &&
+        !showManeuverResult &&
+        !showDefenseManeuverResult &&
         !showGunAttack &&
         commands.map(command => (
           <button
@@ -207,7 +322,6 @@ const ActionCommands = ({
           </button>
         ))}
 
-      {/* ターゲット選択 */}
       {showTargetSelector && (
         <TargetSelector
           characters={characters}
@@ -217,7 +331,13 @@ const ActionCommands = ({
         />
       )}
 
-      {/* 銃撃戦結果 */}
+      {showDistanceSelector && (
+        <DistanceSelector
+          onDistanceSelect={handleDistanceSelect}
+          onCancel={handleCancel}
+        />
+      )}
+
       {showGunAttack && selectedTarget && (
         <GunAttackResult
           attacker={currentCharacter}
@@ -226,19 +346,20 @@ const ActionCommands = ({
           onComplete={handleGunAttackComplete}
           onCancel={handleCancel}
           previousShots={gunAttacks}
+          isZeroDistance={isZeroDistance}
         />
       )}
 
-      {/* 防御コマンド選択 */}
       {showDefenseSelector && selectedTarget && (
         <DefenseCommandSelector
           target={selectedTarget}
           onDefenseSelect={handleDefenseSelect}
           onCancel={handleCancel}
+          isGunAttack={selectedCommand.id === 'shoot'}
+          isZeroDistance={isZeroDistance}
         />
       )}
 
-      {/* 攻撃側成功度選択 */}
       {showAttackerSuccess && currentCharacter && (
         <SuccessLevelSelector
           character={currentCharacter}
@@ -248,7 +369,6 @@ const ActionCommands = ({
         />
       )}
 
-      {/* 防御側成功度選択 */}
       {showDefenderSuccess && selectedTarget && (
         <SuccessLevelSelector
           character={selectedTarget}
@@ -258,7 +378,6 @@ const ActionCommands = ({
         />
       )}
 
-      {/* 戦闘結果表示 */}
       {showCombatResult && currentCharacter && selectedTarget && (
         <CombatResult
           attacker={currentCharacter}
@@ -268,6 +387,27 @@ const ActionCommands = ({
           defenseType={selectedDefense}
           onDamageSubmit={handleDamageSubmit}
           onClose={handleCancel}
+        />
+      )}
+
+      {showManeuverResult && currentCharacter && selectedTarget && (
+        <ManeuverResult
+          attacker={currentCharacter}
+          defender={selectedTarget}
+          attackerSuccess={attackerSuccess}
+          defenderSuccess={defenderSuccess}
+          defenseType={selectedDefense}
+          onComplete={handleManeuverComplete}
+        />
+      )}
+
+      {showDefenseManeuverResult && currentCharacter && selectedTarget && (
+        <DefenseManeuverResult
+          attacker={currentCharacter}
+          defender={selectedTarget}
+          attackerSuccess={attackerSuccess}
+          defenderSuccess={defenderSuccess}
+          onComplete={handleDefenseManeuverComplete}
         />
       )}
     </div>

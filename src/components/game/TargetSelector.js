@@ -6,8 +6,8 @@ const TargetSelector = ({ characters, currentCharacterId, onTargetSelect, onCanc
   if (!currentCharacterId) return null;
 
   // 参加中（非離脱）かつ現在のキャラクター以外をターゲットとして抽出
-  const targetCharacters = characters.filter(char => 
-    char.id !== currentCharacterId && 
+  const targetCharacters = characters.filter(char =>
+    char.id !== currentCharacterId &&
     char.status === 'active' // アクティブなキャラクターのみを対象とする
   );
 
@@ -41,7 +41,6 @@ const TargetSelector = ({ characters, currentCharacterId, onTargetSelect, onCanc
           >
             <div className="target-info-group">
               <span className="target-name">{character.name}</span>
-              <span className="target-info">HP: {character.hp}</span>
             </div>
           </button>
         ))}

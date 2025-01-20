@@ -222,6 +222,18 @@ const CharacterForm = ({ onAddCharacter, editCharacter = null }) => {
               </svg>
             )}
           </button>
+          <button
+            type="button"
+            onClick={() => handleConditionToggle('拘束')}
+            className={`condition-button ${isConditionActive('拘束') ? 'active' : 'inactive'}`}
+          >
+            拘束
+            {isConditionActive('拘束') && (
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+            )}
+          </button>
         </div>
       </div>
 

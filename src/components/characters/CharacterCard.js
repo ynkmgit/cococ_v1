@@ -176,7 +176,8 @@ const CharacterCard = ({
                 condition === '転倒' ? 'condition-badge-fall' :
                   condition === '潜在狂気' ? 'condition-badge-latent' :
                     condition === '狂気発作' ? 'condition-badge-madness' :
-                      condition === '意識不明' ? 'condition-badge-unconscious' : 'condition-badge-other'
+                      condition === '意識不明' ? 'condition-badge-unconscious' :
+                        condition === '拘束' ? 'condition-badge-bound' : 'condition-badge-other'
                 }`}
             >
               {condition}

@@ -33,7 +33,7 @@ const GameSidebar = ({
       </div>
 
       <div className="command-section border-b border-gray-200 py-4">
-        <h3 className="subsection-title font-bold mb-4">行動コマンド</h3>
+        <h3 className="subsection-title font-bold mb-4">行動選択</h3>
         {currentCharacter && (
           <ActionCommands
             characters={characters}

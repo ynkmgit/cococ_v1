@@ -22,11 +22,12 @@ const GunAttackResult = ({
   onSingleShot,
   onComplete,
   onCancel,
-  previousShots = []
+  previousShots = [],
+  isZeroDistance = false
 }) => {
   const [totalShots, setTotalShots] = useState(null);
   const [currentAttackSuccess, setCurrentAttackSuccess] = useState(null);
-  const [currentDamage, setCurrentDamage] = useState('');
+  const [currentDamage, setCurrentDamage] = useState('0');
   const [showDamageInput, setShowDamageInput] = useState(false);
 
   const handleShotsSelect = (shots) => {
@@ -38,7 +39,6 @@ const GunAttackResult = ({
     if (successLevelValue[success] >= successLevelValue['normal']) {
       setShowDamageInput(true);
     } else {
-      // 失敗の場合は直接次の射撃へ処理
       handleShot(success, 0);
     }
   };
@@ -50,7 +50,14 @@ const GunAttackResult = ({
   };
 
   const handleShot = (success, damage) => {
-    onSingleShot({ success, damage });
+    const finalDamage = isZeroDistance ? Math.ceil(damage * 1.5) : damage;
+    
+    onSingleShot({ 
+      success, 
+      damage: finalDamage, 
+      isZeroDistance 
+    });
+    
     setCurrentAttackSuccess(null);
     setCurrentDamage('');
     setShowDamageInput(false);
@@ -76,7 +83,6 @@ const GunAttackResult = ({
       </div>
 
       <div className="combat-result-content">
-        {/* 射撃回数選択 */}
         {totalShots === null && (
           <div className="shots-selector">
             <h5 className="section-subtitle">射撃回数を選択</h5>
@@ -100,12 +106,10 @@ const GunAttackResult = ({
 
         {totalShots !== null && (
           <>
-            {/* 残り射撃回数表示 */}
             <div className="status-display">
               残り射撃回数: {totalShots - previousShots.length}回
             </div>
 
-            {/* これまでの射撃結果リスト */}
             {previousShots.length > 0 && (
               <div className="previous-results">
                 <h5 className="section-subtitle">射撃結果</h5>
@@ -120,7 +124,6 @@ const GunAttackResult = ({
               </div>
             )}
 
-            {/* 次の射撃の成功度選択 */}
             {previousShots.length < totalShots && !currentAttackSuccess && !showDamageInput && (
               <SuccessLevelSelector
                 character={attacker}
@@ -130,7 +133,6 @@ const GunAttackResult = ({
               />
             )}
 
-            {/* ダメージ入力フォーム */}
             {showDamageInput && (
               <form onSubmit={handleDamageSubmit} className="damage-input-form">
                 <label htmlFor="damage" className="damage-input-label">
