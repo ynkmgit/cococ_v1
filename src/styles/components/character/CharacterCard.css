@@ -1,0 +1,207 @@
+/* Character Card Base */
+.character-card {
+  width: 300px;
+  flex: 0 0 300px;
+  background: white;
+  border: 1px solid var(--gray-200);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s ease, background-color 0.3s ease, transform 0.3s ease;
+}
+
+.character-card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+/* Card Header */
+.character-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-4);
+}
+
+.character-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* Character Name */
+.character-name {
+  font-weight: bold;
+  font-size: 1.125rem;
+}
+
+.character-name.inactive {
+  color: var(--gray-600);
+}
+
+/* Status Display */
+.character-status-display {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* Status Badges */
+.status-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--radius-full);
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.status-active {
+  background-color: var(--success);
+  color: white;
+}
+
+.status-inactive {
+  background-color: var(--gray-400);
+  color: white;
+}
+
+/* Action Status */
+.action-status {
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.acted-badge {
+  background-color: #dbeafe;
+  color: #1e40af;
+}
+
+.waiting-badge {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+/* HP System */
+.hp-bar {
+  width: 100%;
+  height: 8px;
+  background-color: var(--gray-200);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  margin: var(--space-2) 0;
+  opacity: 1;
+}
+
+.hp-bar.inactive {
+  opacity: 0.7;
+}
+
+.hp-bar-fill {
+  height: 100%;
+  background-color: var(--success);
+  transition: width 0.3s ease-out;
+}
+
+.hp-bar-fill.hp-bar-low {
+  background-color: var(--danger);
+}
+
+.hp-bar-fill.hp-bar-medium {
+  background-color: var(--warning);
+}
+
+.hp-text {
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--gray-600);
+}
+
+/* Conditions */
+.conditions-area {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+.condition-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  font-size: 0.875rem;
+}
+
+.condition-badge-severe {
+  background-color: #FEE2E2;
+  color: #991B1B;
+  border: 1px solid #FECACA;
+}
+
+.condition-badge-other {
+  background-color: #FEF3C7;
+  color: #92400E;
+  border: 1px solid #FDE68A;
+}
+
+.condition-remove-button {
+  background: none;
+  border: none;
+  padding: 0 2px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Stats */
+.character-stats {
+  margin-top: var(--space-2);
+}
+
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.stat-label {
+  color: inherit;
+}
+
+.stat-label.inactive {
+  color: var(--gray-600);
+}
+
+.stat-value {
+  font-weight: 500;
+}
+
+/* Card Actions */
+.character-card-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.character-action-button {
+  padding: var(--space-1) var(--space-2);
+}
+
+/* Card States */
+.current-character {
+  box-shadow: 0 0 0 2px var(--primary);
+  background-color: var(--gray-50);
+}
+
+.current-character:hover {
+  box-shadow: 0 0 0 2px var(--primary), var(--shadow-md);
+}
+
+.acted {
+  background-color: #f0f9ff;
+}

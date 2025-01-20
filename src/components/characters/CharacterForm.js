@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { validateCharacter } from '../../utils/characterUtils';
-import { CharacterManager } from '../../utils/characterManager';
-import '../../styles/form.css';  // パスを更新
+import { validateCharacter } from '@/utils/characterUtils';
+import { CharacterManager } from '@/utils/characterManager';
+import '@/styles/global/form.css';
+import '@/styles/components/character/CharacterForm.css';
 
 const CharacterForm = ({ onAddCharacter, editCharacter = null }) => {
   const [newCharacter, setNewCharacter] = useState(editCharacter || {

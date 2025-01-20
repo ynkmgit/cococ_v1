@@ -1,0 +1,30 @@
+/* Character List */
+.section {
+  margin-bottom: var(--space-lg);
+}
+
+.character-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  width: 100%;
+  min-width: 0;
+}
+
+/* Character List Header */
+.character-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding: 0.5rem;
+  background-color: white;
+  border-radius: 0.5rem;
+}
+
+/* Character List Controls */
+.character-list-controls {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}

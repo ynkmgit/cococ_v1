@@ -5,9 +5,9 @@ import React from 'react';
 import RouteConfig from './routes/RouteConfig';
 
 // スタイルのインポート
-import './styles/variables.css';
-import './styles/components.css';
-import './styles/layout.css';  // パスを更新
+import './styles/global/variables.css';
+import './styles/global/components.css';
+import './styles/global/layout.css';
 
 function App() {
   return (

@@ -1,0 +1,119 @@
+/* Base Layout */
+.game-container {
+  display: flex;
+  height: 100vh;
+  background-color: #f3f4f6;
+  overflow: hidden;
+  /* コンテナレベルでオーバーフローを防ぐ */
+}
+
+/* Sidebars */
+.game-sidebar {
+  width: 260px;
+  min-width: 260px;
+  background-color: white;
+  padding: 1rem;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  overflow-y: auto;
+  flex-shrink: 0;
+  /* サイドバーの幅を固定 */
+}
+
+.game-sidebar.right {
+  width: 420px;
+  min-width: 420px;
+}
+
+/* Main Content */
+.game-main {
+  flex: 1 1 0%;
+  /* flex-basisを0%に設定して縮小を許可 */
+  min-width: 0;
+  /* 重要: flexアイテムの最小幅を0に */
+  margin: 1rem;
+  overflow: hidden;
+  /* コンテナレベルでオーバーフローを防ぐ */
+  display: flex;
+}
+
+.game-main-inner {
+  flex: 1;
+  min-width: 0;
+  /* 内部のflexアイテムも最小幅を0に */
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  overflow-y: auto;
+  display: flex;
+  /* flex方向を維持 */
+}
+
+/* Character List は character.css で定義 */
+
+/* Game Status */
+.status-group {
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.status-group:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+  margin-bottom: 0;
+}
+
+.status-label {
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+.character-name {
+  color: #111827;
+  font-size: 1.25rem;
+  font-weight: 600;
+  word-break: break-all;
+}
+
+.character-dex {
+  color: #4b5563;
+  font-size: 1rem;
+}
+
+/* Action Controls */
+.next-turn-btn,
+.reset-button {
+  width: 100%;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 0.375rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.next-turn-btn {
+  background-color: #3b82f6;
+  color: white;
+  max-width: 200px;
+}
+
+.next-turn-btn:hover:not(:disabled) {
+  background-color: #2563eb;
+}
+
+.next-turn-btn:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.reset-button {
+  background-color: #ef4444;
+  color: white;
+  margin-top: 1rem;
+}
+
+.reset-button:hover {
+  background-color: #dc2626;
+}

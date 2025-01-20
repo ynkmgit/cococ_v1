@@ -4,9 +4,9 @@ import GameMain from './components/GameMain';
 import { useGameState } from './hooks/useGameState';
 import { useCharacterActions } from './hooks/useCharacterActions';
 import gameEvents from '@/utils/GameEventEmitter';
-import '@/styles/layout.css';
-import '@/styles/form.css';
-import '@/styles/character.css';
+import '@/styles/global/layout.css';
+import '@/styles/global/form.css';
+import '@/styles/components/character/CharacterList.css';
 
 const Cococ = () => {
   const {

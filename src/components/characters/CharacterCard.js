@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { calculateHPPercentage } from '../../utils/characterUtils';
+import { calculateHPPercentage } from '@/utils/characterUtils';
 import CharacterForm from './CharacterForm';
-import '../../styles/character.css';
+import '@/styles/components/character/CharacterCard.css';
 
 const CharacterCard = ({
   character,
