@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import { validateCharacter } from '@/utils/characterUtils';
 import { CharacterManager } from '@/utils/characterManager';
-import '@/styles/global/form.css';
 import '@/styles/components/character/CharacterForm.css';
 
-const CharacterForm = ({ onAddCharacter, editCharacter = null }) => {
+const CharacterForm = ({ onAddCharacter, editCharacter = null, onCancel, isAddForm = true }) => {
   const [newCharacter, setNewCharacter] = useState(editCharacter || {
     name: '',
     currentHP: 0,
@@ -30,7 +29,10 @@ const CharacterForm = ({ onAddCharacter, editCharacter = null }) => {
 
       const manager = new CharacterManager([updated]);
       const [calculatedCharacter] = manager.getCharacters();
-      return calculatedCharacter;
+      return {
+        ...calculatedCharacter,
+        dexModifier: updated.dex * 2
+      };
     });
 
     setErrors({});
@@ -49,7 +51,8 @@ const CharacterForm = ({ onAddCharacter, editCharacter = null }) => {
     });
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = (e) => {
+    e.preventDefault();
     const validationErrors = validateCharacter(newCharacter);
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
@@ -74,174 +77,107 @@ const CharacterForm = ({ onAddCharacter, editCharacter = null }) => {
     setErrors({});
   };
 
-  const isConditionActive = (condition) => (newCharacter.conditions || []).includes(condition);
-
   return (
-    <div className="character-form">
-      <h2 className="form-title">{editCharacter ? 'キャラクター編集' : '新規キャラクター追加'}</h2>
+    <div className={`character-form-container ${isAddForm ? 'add-form' : 'edit-form'}`}>
+      <header className="form-header">
+        <h1 className="form-title">
+          {editCharacter ? 'キャラクター編集' : '新規キャラクター追加'}
+        </h1>
+      </header>
 
-      <div className="form-section">
-        <div className="form-field">
-          <label htmlFor="name" className="form-label">キャラクター名</label>
+      <form onSubmit={handleSubmit}>
+        <div className="form-section">
+          <label className="form-label">キャラクター名</label>
           <input
             type="text"
-            id="name"
             name="name"
             value={newCharacter.name}
             onChange={handleInputChange}
-            className="form-input"
+            className={`form-input ${errors.name ? 'input-error' : ''}`}
             placeholder="名前を入力"
           />
-          {errors.name && <span className="error-text">{errors.name}</span>}
+          {errors.name && <span className="form-error">{errors.name}</span>}
         </div>
 
-        <div className="form-row">
-          <div className="form-field">
-            <label htmlFor="currentHP" className="form-label">現在HP</label>
+        <div className="form-section">
+          <label className="form-label">HP</label>
+          <div className="hp-input-group">
             <input
               type="number"
-              id="currentHP"
               name="currentHP"
               value={newCharacter.currentHP}
               onChange={handleInputChange}
-              className="form-input"
+              className={`hp-input ${errors.currentHP ? 'input-error' : ''}`}
               min="0"
+              max={newCharacter.maxHP}
             />
-            {errors.currentHP && <span className="error-text">{errors.currentHP}</span>}
-          </div>
-
-          <div className="form-field">
-            <label htmlFor="maxHP" className="form-label">最大HP</label>
+            <span className="hp-separator">/</span>
             <input
               type="number"
-              id="maxHP"
               name="maxHP"
               value={newCharacter.maxHP}
               onChange={handleInputChange}
-              className="form-input"
+              className={`hp-input ${errors.maxHP ? 'input-error' : ''}`}
               min="0"
             />
-            {errors.maxHP && <span className="error-text">{errors.maxHP}</span>}
           </div>
         </div>
 
-        <div className="form-row">
-          <div className="form-field">
-            <label htmlFor="dex" className="form-label">DEX</label>
+        <div className="form-section">
+          <label className="form-label">DEX</label>
+          <div className="dex-input-group">
             <input
               type="number"
-              id="dex"
               name="dex"
               value={newCharacter.dex}
               onChange={handleInputChange}
-              className="form-input"
+              className={`dex-input ${errors.dex ? 'input-error' : ''}`}
               min="0"
             />
-            {errors.dex && <span className="error-text">{errors.dex}</span>}
-          </div>
-
-          <div className="form-checkbox-field">
-            <label className="checkbox-label">
-              <input
-                type="checkbox"
-                name="useGun"
-                checked={newCharacter.useGun}
-                onChange={handleInputChange}
-                className="form-checkbox"
-              />
-              <span>火器使用</span>
-            </label>
+            <span className="dex-modifier">
+              補正後: {newCharacter.effectiveDex}
+            </span>
           </div>
         </div>
 
-        <div className="info-box">
-          実効DEX: <strong>{newCharacter.effectiveDex || newCharacter.dex}</strong>
+        <div className="form-section">
+          <div className="gun-toggle-group">
+            <div
+              className={`gun-toggle ${newCharacter.useGun ? 'active' : ''}`}
+              onClick={() => handleInputChange({
+                target: {
+                  name: 'useGun',
+                  type: 'checkbox',
+                  checked: !newCharacter.useGun
+                }
+              })}
+            />
+            <span className="gun-toggle-label">
+              {newCharacter.useGun ? '火器使用中' : '火器未使用'}
+            </span>
+          </div>
         </div>
-      </div>
 
-      <div className="form-section">
-        <label className="form-label">状態異常</label>
-        <div className="condition-group">
-          <button
-            type="button"
-            onClick={() => handleConditionToggle('重症')}
-            className={`condition-button ${isConditionActive('重症') ? 'active' : 'inactive'}`}
-          >
-            重症
-            {isConditionActive('重症') && (
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-            )}
-          </button>
-          <button
-            type="button"
-            onClick={() => handleConditionToggle('転倒')}
-            className={`condition-button ${isConditionActive('転倒') ? 'active' : 'inactive'}`}
-          >
-            転倒
-            {isConditionActive('転倒') && (
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-            )}
-          </button>
-          <button
-            type="button"
-            onClick={() => handleConditionToggle('潜在狂気')}
-            className={`condition-button ${isConditionActive('潜在狂気') ? 'active' : 'inactive'}`}
-          >
-            潜在狂気
-            {isConditionActive('潜在狂気') && (
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-            )}
-          </button>
-          <button
-            type="button"
-            onClick={() => handleConditionToggle('狂気発作')}
-            className={`condition-button ${isConditionActive('狂気発作') ? 'active' : 'inactive'}`}
-          >
-            狂気発作
-            {isConditionActive('狂気発作') && (
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-            )}
-          </button>
-          <button
-            type="button"
-            onClick={() => handleConditionToggle('意識不明')}
-            className={`condition-button ${isConditionActive('意識不明') ? 'active' : 'inactive'}`}
-          >
-            意識不明
-            {isConditionActive('意識不明') && (
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-            )}
-          </button>
-          <button
-            type="button"
-            onClick={() => handleConditionToggle('拘束')}
-            className={`condition-button ${isConditionActive('拘束') ? 'active' : 'inactive'}`}
-          >
-            拘束
-            {isConditionActive('拘束') && (
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-            )}
-          </button>
+        <div className="form-section">
+          <label className="form-label">状態</label>
+          <div className="conditions-grid">
+            {['重症', '転倒', '潜在狂気', '狂気発作', '意識不明', '拘束'].map((condition) => (
+              <button
+                key={condition}
+                type="button"
+                className={`condition-button ${newCharacter.conditions.includes(condition) ? 'active' : ''
+                  }`}
+                onClick={() => handleConditionToggle(condition)}
+              >
+                {condition}
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
 
-      <div className="form-section">
-        <div className="form-field">
-          <label htmlFor="memo" className="form-label">メモ</label>
+        <div className="form-section">
+          <label className="form-label">メモ</label>
           <textarea
-            id="memo"
             name="memo"
             value={newCharacter.memo}
             onChange={handleInputChange}
@@ -250,15 +186,23 @@ const CharacterForm = ({ onAddCharacter, editCharacter = null }) => {
             rows="3"
           />
         </div>
-      </div>
 
-      <button
-        type="button"
-        onClick={handleSubmit}
-        className="submit-button"
-      >
-        {editCharacter ? '更新する' : 'キャラクターを追加'}
-      </button>
+        <div className="form-actions">
+          <button
+            type="button"
+            onClick={onCancel}
+            className="form-button danger"
+          >
+            キャンセル
+          </button>
+          <button
+            type="submit"
+            className="form-button primary"
+          >
+            {editCharacter ? '更新する' : 'キャラクターを追加'}
+          </button>
+        </div>
+      </form>
     </div>
   );
 };

@@ -10,7 +10,7 @@ export class CharacterManager {
       ...char,
       status: char.status || 'active',
       conditions: char.conditions || [],  // 状態異常の配列を追加
-      effectiveDex: this.calculateEffectiveDex(char)
+      effectiveDex: this.calculateEffectiveDex(char).effectiveDex
     })));
   }
 
@@ -121,7 +121,12 @@ export class CharacterManager {
    * @returns {number}
    */
   calculateEffectiveDex(character) {
-    return character.useGun ? character.dex * 2 : character.dex;
+    const baseDex = character.dex || 0;
+    const dexModifier = Math.floor((baseDex - 10) / 2);
+    return {
+      effectiveDex: character.useGun ? baseDex * 2 : baseDex,
+      dexModifier
+    };
   }
 
   /**
@@ -137,11 +142,11 @@ export class CharacterManager {
         inactive: 1,
         retired: 2
       };
-      
+
       // まず参加状態でソート
       const statusDiff = statusPriority[a.status] - statusPriority[b.status];
       if (statusDiff !== 0) return statusDiff;
-      
+
       // 同じ状態の場合は実効DEXでソート
       return b.effectiveDex - a.effectiveDex;
     });

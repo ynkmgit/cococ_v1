@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { calculateHPPercentage } from '@/utils/characterUtils';
 import CharacterForm from './CharacterForm';
 import '@/styles/components/character/CharacterCard.css';
@@ -12,7 +12,9 @@ const CharacterCard = ({
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [isEditingMemo, setIsEditingMemo] = useState(false);
+  const [isEditingHP, setIsEditingHP] = useState(false);
   const [memoInput, setMemoInput] = useState(character.memo || '');
+  const hpInputRef = useRef(null);
 
   const handleInputChange = (field, value) => {
     if (field === 'currentHP') {
@@ -99,13 +101,8 @@ const CharacterCard = ({
         <CharacterForm
           editCharacter={character}
           onAddCharacter={handleEditSubmit}
+          onCancel={() => setIsEditing(false)}
         />
-        <button
-          onClick={() => setIsEditing(false)}
-          className="btn btn-danger"
-        >
-          キャンセル
-        </button>
       </div>
     );
   }
@@ -114,26 +111,14 @@ const CharacterCard = ({
 
   return (
     <div className={getCardStyle()}>
-      <div className="character-card-header">
-        <div className="character-status-display">
-          <h3 className={`character-name ${character.status !== 'active' ? 'inactive' : ''}`}>
-            {character.name}
-          </h3>
-          <div className="character-status-display">
-            <button
-              onClick={handleStatusToggle}
-              className={`status-badge ${statusBadge.className}`}
-            >
-              {statusBadge.text}
-            </button>
-            {character.status === 'active' && (
-              <span className={`action-status ${hasActed ? 'acted-badge' : 'waiting-badge'}`}>
-                {hasActed ? '行動済' : '未行動'}
-              </span>
-            )}
-          </div>
-        </div>
-        <div className="character-card-actions">
+      <header className="character-card-header">
+        <div className="character-actions-row">
+          <button
+            onClick={() => setIsEditing(true)}
+            className="btn btn-secondary character-action-button"
+          >
+            編集
+          </button>
           <button
             onClick={() => {
               const copiedCharacter = {
@@ -149,12 +134,6 @@ const CharacterCard = ({
             複製
           </button>
           <button
-            onClick={() => setIsEditing(true)}
-            className="btn btn-secondary character-action-button"
-          >
-            編集
-          </button>
-          <button
             onClick={() => {
               if (window.confirm(`${character.name}を本当に削除しますか？`)) {
                 onRemove(character.id);
@@ -165,125 +144,156 @@ const CharacterCard = ({
             削除
           </button>
         </div>
-      </div>
 
-      {character.conditions && character.conditions.length > 0 && (
-        <div className="conditions-area">
-          {character.conditions.map((condition, index) => (
-            <span
-              key={index}
-              className={`condition-badge ${condition === '重症' ? 'condition-badge-severe' :
-                condition === '転倒' ? 'condition-badge-fall' :
-                  condition === '潜在狂気' ? 'condition-badge-latent' :
-                    condition === '狂気発作' ? 'condition-badge-madness' :
-                      condition === '意識不明' ? 'condition-badge-unconscious' :
-                        condition === '拘束' ? 'condition-badge-bound' : 'condition-badge-other'
-                }`}
-            >
-              {condition}
-              <button
-                onClick={() => handleConditionRemove(condition)}
-                className="condition-remove-button"
-              >
-                ×
-              </button>
-            </span>
-          ))}
-        </div>
-      )}
+        <h1 className="character-name">
+          {character.name}
+        </h1>
 
-      <div className="character-card-body">
-        <div>
-          <label
-            htmlFor={`currentHP-${character.id}`}
-            className={`stat-label ${character.status !== 'active' ? 'inactive' : ''}`}
+        <div className="character-status-row">
+          <button
+            onClick={handleStatusToggle}
+            className={`status-badge ${statusBadge.className}`}
           >
-            現在HP
-          </label>
-          <input
-            id={`currentHP-${character.id}`}
-            type="number"
-            value={character.currentHP}
-            onChange={(e) => handleInputChange('currentHP', e.target.value)}
-            className={`input ${character.status !== 'active' ? 'bg-gray-50' : ''}`}
-            min="0"
-            max={character.maxHP}
-            disabled={character.status === 'retired'}
-          />
+            {statusBadge.text}
+          </button>
+          {character.status === 'active' && (
+            <span className={`action-status ${hasActed ? 'acted-badge' : 'waiting-badge'}`}>
+              {hasActed ? '行動済' : '未行動'}
+            </span>
+          )}
         </div>
+      </header>
 
-        <div className={`hp-bar ${character.status !== 'active' ? 'inactive' : ''}`}>
-          <div
-            className={`hp-bar-fill ${getHPBarClass()}`}
-            style={{ width: `${hpPercentage}%` }}
-          />
-        </div>
-        <div className="hp-text">
-          {character.currentHP} / {character.maxHP}
-        </div>
-
-        <div className="character-stats">
-          <div className="stat-row">
-            <span className={`stat-label ${character.status !== 'active' ? 'inactive' : ''}`}>DEX:</span>
-            <span className="stat-value">{character.dex}</span>
-          </div>
-          <div className="stat-row">
-            <span className={`stat-label ${character.status !== 'active' ? 'inactive' : ''}`}>火器使用:</span>
-            <button
-              onClick={handleGunToggle}
-              className={`badge ${character.useGun ? 'badge-success' : 'badge-warning'}`}
-              disabled={character.status === 'retired'}
-            >
-              {character.useGun ? '有' : '無'}
-            </button>
-          </div>
-          <div className="stat-row">
-            <span className={`stat-label ${character.status !== 'active' ? 'inactive' : ''}`}>実効DEX:</span>
-            <span className="stat-value">{character.effectiveDex}</span>
-          </div>
-        </div>
-
-        <div className="character-memo">
-          <div className="memo-label">メモ:</div>
-          {isEditingMemo ? (
-            <div className="memo-edit">
-              <textarea
-                value={memoInput}
-                onChange={(e) => setMemoInput(e.target.value)}
-                className="memo-textarea"
-                rows="3"
-              />
-              <div className="memo-edit-buttons">
+      <main>
+        {character.conditions && character.conditions.length > 0 && (
+          <div className="conditions-area">
+            {character.conditions.map((condition, index) => (
+              <span
+                key={index}
+                className={`condition-badge ${condition === '重症' ? 'condition-badge-severe' :
+                  condition === '転倒' ? 'condition-badge-fall' :
+                    condition === '潜在狂気' ? 'condition-badge-latent' :
+                      condition === '狂気発作' ? 'condition-badge-madness' :
+                        condition === '意識不明' ? 'condition-badge-unconscious' :
+                          condition === '拘束' ? 'condition-badge-bound' : 'condition-badge-other'
+                  }`}
+              >
+                {condition}
                 <button
-                  onClick={() => {
-                    onUpdate(character.id, { memo: memoInput });
-                    setIsEditingMemo(false);
-                  }}
-                  className="btn btn-primary"
+                  onClick={() => handleConditionRemove(condition)}
+                  className="condition-remove-button"
                 >
-                  保存
+                  ×
                 </button>
-                <button
-                  onClick={() => {
-                    setMemoInput(character.memo || '');
-                    setIsEditingMemo(false);
+              </span>
+            ))}
+          </div>
+        )}
+
+        <div>
+          <div className="hp-container">
+            <label
+              className={`stat-label ${character.status !== 'active' ? 'inactive' : ''}`}
+            >
+              HP:
+            </label>
+            <div className="hp-display">
+              <div className={`hp-bar ${character.status !== 'active' ? 'inactive' : ''}`}>
+                <div
+                  className={`hp-bar-fill ${getHPBarClass()}`}
+                  style={{ width: `${hpPercentage}%` }}
+                />
+              </div>
+              {isEditingHP ? (
+                <input
+                  type="number"
+                  value={character.currentHP}
+                  onChange={(e) => handleInputChange('currentHP', e.target.value)}
+                  className="hp-input"
+                  min="0"
+                  max={character.maxHP}
+                  disabled={character.status === 'retired'}
+                  ref={hpInputRef}
+                  onBlur={() => setIsEditingHP(false)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      setIsEditingHP(false);
+                    }
                   }}
-                  className="btn btn-secondary"
+                />
+              ) : (
+                <div
+                  className="hp-text"
+                  onClick={() => setIsEditingHP(true)}
                 >
-                  キャンセル
+                  {character.currentHP} / {character.maxHP}
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="character-stats">
+            <div className="stat-row">
+              <div className="dex-container">
+                <span className="dex-label">DEX</span>
+                <span className="dex-value">{character.dex}</span>
+                <span className="dex-modifier">補正後: {character.effectiveDex}</span>
+              </div>
+              <div className="gun-toggle-container">
+                <button
+                  onClick={handleGunToggle}
+                  className={`badge ${character.useGun ? 'badge-success' : 'badge-warning'}`}
+                  disabled={character.status === 'retired'}
+                >
+                  {character.useGun ? '火器使用中' : '火器未使用'}
                 </button>
               </div>
             </div>
-          ) : (
-            <div
-              className="memo-content"
-              onClick={() => setIsEditingMemo(true)}
-            >
-              {character.memo || 'クリックしてメモを追加'}
-            </div>
-          )}
+          </div>
+
+          <div className="character-memo">
+            <div className="memo-label">メモ:</div>
+            {isEditingMemo ? (
+              <div className="memo-edit">
+                <textarea
+                  value={memoInput}
+                  onChange={(e) => setMemoInput(e.target.value)}
+                  className="memo-textarea"
+                  rows="3"
+                />
+                <div className="memo-edit-buttons">
+                  <button
+                    onClick={() => {
+                      onUpdate(character.id, { memo: memoInput });
+                      setIsEditingMemo(false);
+                    }}
+                    className="btn btn-primary"
+                  >
+                    保存
+                  </button>
+                  <button
+                    onClick={() => {
+                      setMemoInput(character.memo || '');
+                      setIsEditingMemo(false);
+                    }}
+                    className="btn btn-secondary"
+                  >
+                    キャンセル
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div
+                className="memo-content"
+                onClick={() => setIsEditingMemo(true)}
+                data-empty={!character.memo}
+              >
+                {character.memo || 'クリックしてメモを追加'}
+              </div>
+            )}
+          </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 };

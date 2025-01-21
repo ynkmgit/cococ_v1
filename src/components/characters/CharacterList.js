@@ -41,14 +41,14 @@ const CharacterList = ({
                 >
                   {showInactive ? '不参加キャラを非表示' : '不参加キャラを表示'}
                 </button>
+                <button
+                  onClick={() => setShowForm(true)}
+                  className="btn btn-primary"
+                >
+                  キャラクターを追加
+                </button>
               </>
             )}
-            <button
-              onClick={() => setShowForm(!showForm)}
-              className={`btn ${showForm ? 'btn-danger' : 'btn-primary'}`}
-            >
-              {showForm ? '閉じる' : 'キャラクターを追加'}
-            </button>
           </div>
         </div>
 
@@ -59,6 +59,7 @@ const CharacterList = ({
                 onAddCharacter(character);
                 setShowForm(false);
               }}
+              onCancel={() => setShowForm(false)}
             />
           </div>
         )}
