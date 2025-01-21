@@ -82,6 +82,12 @@ const CharacterCard = ({
     return style.trim();
   };
 
+  const getHeaderClass = () => {
+    let headerClass = 'character-card-header ';
+    headerClass += character.isEnemy ? 'enemy' : 'ally';
+    return headerClass.trim();
+  };
+
   const getStatusBadgeInfo = () => {
     switch (character.status) {
       case 'active':
@@ -111,7 +117,7 @@ const CharacterCard = ({
 
   return (
     <div className={getCardStyle()}>
-      <header className="character-card-header">
+      <header className={getHeaderClass()}>
         <div className="character-actions-row">
           <button
             onClick={() => setIsEditing(true)}
@@ -145,10 +151,12 @@ const CharacterCard = ({
           </button>
         </div>
 
-        <h1 className="character-name">
+        <h1 className={`character-name ${character.isEnemy ? 'enemy' : 'ally'}`}>
           {character.name}
         </h1>
+      </header>
 
+      <main>
         <div className="character-status-row">
           <button
             onClick={handleStatusToggle}
@@ -162,9 +170,7 @@ const CharacterCard = ({
             </span>
           )}
         </div>
-      </header>
 
-      <main>
         {character.conditions && character.conditions.length > 0 && (
           <div className="conditions-area">
             {character.conditions.map((condition, index) => (

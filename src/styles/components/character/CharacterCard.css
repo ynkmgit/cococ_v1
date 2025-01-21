@@ -20,6 +20,18 @@
   flex-direction: column;
   gap: 0.5rem;
   margin-bottom: var(--space-2);
+  background-color: rgba(0, 123, 255, 0.05);
+  color: white;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+}
+
+.character-card-header.enemy {
+  background-color: rgba(255, 0, 0, 0.15);
+}
+
+.character-card-header.ally {
+  background-color: rgba(0, 123, 255, 0.15);
 }
 
 .character-actions-row {
@@ -45,6 +57,14 @@
 .character-name {
   font-weight: bold;
   font-size: 1.125rem;
+}
+
+.character-name.ally {
+  color: var(--primary);
+}
+
+.character-name.enemy {
+  color: var(--danger);
 }
 
 .character-name.inactive {

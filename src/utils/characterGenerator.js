@@ -34,6 +34,9 @@ export const generateRandomCharacter = () => {
     useGun: Math.random() > 0.8, // 20%の確率で火器所持
     currentHP: maxHP,
     maxHP,
-    status: 'active'
+    status: 'active',
+    conditions: [],
+    memo: '',
+    isEnemy: Math.random() > 0.5 // 50%の確率で敵キャラクター
   };
 };

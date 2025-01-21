@@ -11,7 +11,8 @@ const CharacterForm = ({ onAddCharacter, editCharacter = null, onCancel, isAddFo
     dex: 0,
     useGun: false,
     conditions: [],
-    memo: ''
+    memo: '',
+    isEnemy: false
   });
 
   const [errors, setErrors] = useState({});
@@ -68,7 +69,8 @@ const CharacterForm = ({ onAddCharacter, editCharacter = null, onCancel, isAddFo
         dex: 0,
         useGun: false,
         conditions: [],
-        memo: ''
+        memo: '',
+        isEnemy: false
       });
     }
     setErrors({});
@@ -94,6 +96,30 @@ const CharacterForm = ({ onAddCharacter, editCharacter = null, onCancel, isAddFo
             placeholder="名前を入力"
           />
           {errors.name && <span className="form-error">{errors.name}</span>}
+        </div>
+
+        <div className="form-section">
+          <label className="form-label">タイプ</label>
+          <div className="type-radio-group">
+            <label className="type-radio-label">
+              <input
+                type="radio"
+                name="isEnemy"
+                checked={!newCharacter.isEnemy}
+                onChange={() => setNewCharacter(prev => ({ ...prev, isEnemy: false }))}
+              />
+              味方
+            </label>
+            <label className="type-radio-label">
+              <input
+                type="radio"
+                name="isEnemy"
+                checked={newCharacter.isEnemy}
+                onChange={() => setNewCharacter(prev => ({ ...prev, isEnemy: true }))}
+              />
+              敵
+            </label>
+          </div>
         </div>
 
         <div className="form-section">
