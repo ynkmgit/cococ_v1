@@ -29,10 +29,7 @@ const CharacterForm = ({ onAddCharacter, editCharacter = null, onCancel, isAddFo
 
       const manager = new CharacterManager([updated]);
       const [calculatedCharacter] = manager.getCharacters();
-      return {
-        ...calculatedCharacter,
-        dexModifier: updated.dex * 2
-      };
+      return calculatedCharacter;
     });
 
     setErrors({});

@@ -60,15 +60,15 @@ const ActionCommands = ({
     commands = [
       {
         id: 'attack',
-        name: '近接攻撃',
-        description: '近接武器による攻撃を行う',
+        name: '近接戦闘',
+        description: 'ダメージを加える近接の攻撃',
         icon: '⚔️'
       },
       {
         id: 'maneuver',
-        name: '戦闘マヌーバー',
-        description: '特殊な戦闘行動を行う',
-        icon: '🎯'
+        name: 'マヌーバー攻撃',
+        description: 'ダメージを加えること以外の目的とする行動',
+        icon: '🤼'
       },
       {
         id: 'retire',
@@ -347,6 +347,15 @@ const ActionCommands = ({
           onCancel={handleCancel}
           previousShots={gunAttacks}
           isZeroDistance={isZeroDistance}
+          skipSuccessCheck={
+            selectedDefense === 'defense-maneuver' &&
+            defenderSuccess &&
+            attackerSuccess &&
+            // 両方失敗でない場合に、攻撃側の成功度が防御側以上なら射撃側の勝利
+            attackerSuccess !== 'failure' &&
+            defenderSuccess !== 'failure' &&
+            successLevelValue[attackerSuccess] >= successLevelValue[defenderSuccess]
+          }
         />
       )}
 

@@ -10,7 +10,7 @@ export class CharacterManager {
       ...char,
       status: char.status || 'active',
       conditions: char.conditions || [],  // 状態異常の配列を追加
-      effectiveDex: this.calculateEffectiveDex(char).effectiveDex
+      effectiveDex: this.calculateEffectiveDex(char)
     })));
   }
 
@@ -121,12 +121,7 @@ export class CharacterManager {
    * @returns {number}
    */
   calculateEffectiveDex(character) {
-    const baseDex = character.dex || 0;
-    const dexModifier = Math.floor((baseDex - 10) / 2);
-    return {
-      effectiveDex: character.useGun ? baseDex * 2 : baseDex,
-      dexModifier
-    };
+    return character.useGun ? character.dex * 2 : character.dex;
   }
 
   /**

@@ -1,12 +1,12 @@
 import React from 'react';
 import '../../styles/commands.css';
 
-const DefenseCommandSelector = ({ 
-  target, 
-  onDefenseSelect, 
+const DefenseCommandSelector = ({
+  target,
+  onDefenseSelect,
   onCancel,
   isGunAttack = false,
-  isZeroDistance = false 
+  isZeroDistance = false
 }) => {
   const baseDefenseCommands = [
     {
@@ -24,13 +24,13 @@ const DefenseCommandSelector = ({
     {
       id: 'defense-maneuver',
       name: '防御マヌーバー',
-      description: '攻撃に対して特殊な防御行動を試みる',
-      icon: '🛡️'
+      description: '攻撃に対して防御行動を試みる',
+      icon: '🤼'
     },
     {
       id: 'no-action',
       name: '何もしない',
-      description: '対抗ロールを行わず、攻撃の結果をそのまま受け入れる',
+      description: '攻撃の結果をそのまま受け入れる',
       icon: '🤚'
     }
   ];
@@ -38,19 +38,19 @@ const DefenseCommandSelector = ({
   // 0距離の火器攻撃の場合は選択肢を制限
   const defenseCommands = isGunAttack && isZeroDistance
     ? [
-        {
-          id: 'defense-maneuver',
-          name: '防御マヌーバー',
-          description: '至近距離からの射撃に対して特殊な防御行動を試みる（対抗ロール）',
-          icon: '🛡️'
-        },
-        {
-          id: 'no-action',
-          name: '何もしない',
-          description: '対抗ロールを行わず、攻撃の結果をそのまま受け入れる',
-          icon: '🤚'
-        }
-      ]
+      {
+        id: 'defense-maneuver',
+        name: '防御マヌーバー',
+        description: '0距離射撃に対して防御行動を試みる',
+        icon: '🤼'
+      },
+      {
+        id: 'no-action',
+        name: '何もしない',
+        description: '攻撃の結果をそのまま受け入れる',
+        icon: '🤚'
+      }
+    ]
     : baseDefenseCommands;
 
   const handleDefenseSelect = (commandId) => {

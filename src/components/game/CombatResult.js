@@ -66,7 +66,7 @@ const CombatResult = ({
       if (defenderLevel > attackerLevel) {
         return {
           success: 'defender',
-          message: '応戦・防御マヌーバーに成功！効果を適用してください。',
+          message: '応戦に成功！ダメージを適用してください。',
           showDamageInput: true,
           showCompleteButton: false
         };
@@ -76,7 +76,7 @@ const CombatResult = ({
     // それ以外は攻撃側の勝利
     return {
       success: 'attacker',
-      message: '攻撃・戦闘マヌーバーに成功！効果を適用してください。',
+      message: '攻撃に成功！ダメージを適用してください。',
       showDamageInput: true,
       showCompleteButton: false
     };

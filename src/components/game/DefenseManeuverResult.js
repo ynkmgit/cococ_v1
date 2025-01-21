@@ -38,7 +38,7 @@ const DefenseManeuverResult = ({
     if (defenderLevel > attackerLevel) {
       return {
         success: 'defender',
-        message: '防御マヌーバーが成功！相手の行動を無効化しました。'
+        message: '防御マヌーバーが成功！マヌーバーの効果を適用してください。'
       };
     }
 

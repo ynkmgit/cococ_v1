@@ -240,13 +240,15 @@ const CharacterCard = ({
                 <span className="dex-modifier">補正後: {character.effectiveDex}</span>
               </div>
               <div className="gun-toggle-container">
-                <button
+                <div
                   onClick={handleGunToggle}
-                  className={`badge ${character.useGun ? 'badge-success' : 'badge-warning'}`}
+                  className={`gun-toggle ${character.useGun ? 'active' : ''}`}
                   disabled={character.status === 'retired'}
-                >
+                  aria-label="火器使用"
+                />
+                <span className="gun-toggle-label">
                   {character.useGun ? '火器使用中' : '火器未使用'}
-                </button>
+                </span>
               </div>
             </div>
           </div>
